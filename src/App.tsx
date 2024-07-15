@@ -20,22 +20,29 @@ const makeAMove = ({
   showNextMove,
   pieceSelecteToMove,
   piecesPlayer,
-  setPiecesPlayer1,
+  setPiecesPlayer,
   setPieceSelecteToMove,
   setShowNextMove,
+  setIsTurnOfPlayer
 }: {
   newLocation: string;
   showNextMove: string[];
   pieceSelecteToMove: Piece | undefined;
   piecesPlayer: Piece[];
-  setPiecesPlayer1: any;
+  setPiecesPlayer: any;
   setPieceSelecteToMove: any;
   setShowNextMove: any;
+  setIsTurnOfPlayer: any
 }) => {
+  
   if (showNextMove.includes(newLocation)) {
+    
+  
     const oldPieces = piecesPlayer.filter(
       (piece) => piece.initialPlace !== pieceSelecteToMove?.initialPlace
     );
+
+    console.log('showNextMove',pieceSelecteToMove);
 
     if (
       pieceSelecteToMove !== undefined &&
@@ -43,14 +50,15 @@ const makeAMove = ({
     ) {
       // console.log('makeAMove',showNextMove);
       const spotIsFree = oldPieces.map((piece) => piece.initialPlace).includes(newLocation);
-
+      
+      
       if (!spotIsFree) {
         const newPicesSet = [
           ...oldPieces,
           { ficha: pieceSelecteToMove?.ficha, initialPlace: newLocation },
         ];
-
-        setPiecesPlayer1(newPicesSet);
+        setIsTurnOfPlayer(state => !state);
+        setPiecesPlayer(newPicesSet);
       } else {
         console.log("is noo free");
       }
@@ -64,8 +72,8 @@ function App() {
   const [piecesPlayer1, setPiecesPlayer1] = useState<Piece[]>(fichasPlayer1);
   const [piecesPlayer2, setPiecesPlayer2] = useState<Piece[]>(fichasPlayer2);
   const [pieceSelecteToMove, setPieceSelecteToMove] = useState<Piece>();
-  const [pieceSelecteToMoveEnemy, setPieceSelecteToMoveEnemy] =
-    useState<Piece>();
+  const [isTurnOfPlayer, setIsTurnOfPlayer] = useState(true); 
+  const [pieceSelecteToMoveEnemy, setPieceSelecteToMoveEnemy] =useState<Piece>();
 
   const [showNextMove, setShowNextMove] = useState([]);
   const [showNextMoveEnemy, setShowNextMoveEnemy] = useState([]);
@@ -73,6 +81,7 @@ function App() {
   return (
     <main>
       <section className="w-[800px] border  flex flex-col  mx-auto mt-20   relative  select-none">
+        <p className="text-center"> is Turn of {isTurnOfPlayer ? "player1" : "player2"}</p>
         {/* <div className="flex flex-row ">
           {cols.map((col) => (
             <div
@@ -108,12 +117,13 @@ function App() {
                           onMouseDown={() => {
                             makeAMove({
                               newLocation: location,
-                              showNextMove,
-                              pieceSelecteToMove,
-                              piecesPlayer: piecesPlayer1,
-                              setPiecesPlayer1,
-                              setPieceSelecteToMove,
-                              setShowNextMove,
+                              showNextMove: isTurnOfPlayer ? showNextMove : showNextMoveEnemy,
+                              pieceSelecteToMove: isTurnOfPlayer ? pieceSelecteToMove : pieceSelecteToMoveEnemy,
+                              piecesPlayer: isTurnOfPlayer ? piecesPlayer1 : piecesPlayer2,
+                              setPiecesPlayer : isTurnOfPlayer ? setPiecesPlayer1 : setPiecesPlayer2,
+                              setPieceSelecteToMove : isTurnOfPlayer ? setPieceSelecteToMove : setPieceSelecteToMoveEnemy,
+                              setShowNextMove : isTurnOfPlayer ? setShowNextMove : setShowNextMoveEnemy,
+                              setIsTurnOfPlayer
                             });
                           }}
                           className={` relative  w-16 h-16 border-black border `}
@@ -126,6 +136,7 @@ function App() {
                               pieceSelecteToMove={pieceSelecteToMove}
                               location={location}
                               isEnemy={false}
+                              isTurnOfPlayer={isTurnOfPlayer}
                             >
                               {piecesPlayer1.map((piece) => {
                                 piece.isEnemy = false;
@@ -152,9 +163,10 @@ function App() {
                           {/* ------------------------------------------------------------------------------- */}
                           <PlayerSide
                             showNextMove={showNextMoveEnemy}
-                            pieceSelecteToMove={pieceSelecteToMove}
+                            pieceSelecteToMove={pieceSelecteToMoveEnemy}
                             location={location}
                             isEnemy={true}
+                            isTurnOfPlayer={isTurnOfPlayer}
                           >
                             {piecesPlayer2.map((piece) => {
                               piece.isEnemy = true;
@@ -167,9 +179,9 @@ function App() {
                                       allPiecesPlayer={piecesPlayer2}
                                       setPiecesPlayer={setPiecesPlayer2}
                                       setPieceSelecteToMove={
-                                        setPieceSelecteToMove
+                                        setPieceSelecteToMoveEnemy
                                       }
-                                      pieceSelecteToMove={pieceSelecteToMove}
+                                      pieceSelecteToMove={pieceSelecteToMoveEnemy}
                                     />
                                   )}
                                 </div>
@@ -217,17 +229,20 @@ const PlayerSide = ({
   pieceSelecteToMove,
   location,
   isEnemy,
+  isTurnOfPlayer
 }: {
   children: React.ReactNode;
   showNextMove: any;
   pieceSelecteToMove: any;
   location: string;
   isEnemy: boolean;
+  isTurnOfPlayer: boolean
 }) => {
   return (
     <div className="relative bottom-16 z-90">
       <div>
-        {showNextMove.includes(location) &&
+        { (isTurnOfPlayer === !isEnemy) &&
+        showNextMove.includes(location) &&
           pieceSelecteToMove !== undefined && (
             <div
               className={`absolute w-16 h-16 ${
