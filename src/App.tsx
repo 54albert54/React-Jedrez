@@ -106,6 +106,7 @@ function App() {
                                         }
                                         pieceSelecteToMove={pieceSelecteToMove}
                                         showNextMove={ isTurnOfPlayer ? showNextMove : showNextMoveEnemy}
+                                        enemyPieces={ isTurnOfPlayer ? piecesPlayer2 : piecesPlayer1}
                                       />
                                     )}
                                   </div>
@@ -137,6 +138,7 @@ function App() {
                                       setPieceSelecteToMove={setPieceSelecteToMoveEnemy}
                                       pieceSelecteToMove={pieceSelecteToMoveEnemy}
                                       showNextMove={ isTurnOfPlayer ? showNextMove : showNextMoveEnemy}
+                                      enemyPieces={ isTurnOfPlayer ? piecesPlayer2 : piecesPlayer1}
                                     />
                                   )}
                                 </div>
@@ -170,7 +172,7 @@ const PaintBoard = ({
     <div
       key={generateRandomString(8)}
       className={`${
-        isBlack ? "bg-white text-black/60" : "bg-black text-white/60e"
+        isBlack ? "bg-white text-black/60" : "bg-black text-white/60"
       } relative z-0 row w-16 h-16  flex justify-center items-center  `}
     >
       {location}

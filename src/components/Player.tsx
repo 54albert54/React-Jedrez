@@ -9,7 +9,8 @@ const Player = ({
   pieceSelecteToMove,
   piecesPlayer,
   setPieceSelecteToMove,
-  showNextMove
+  showNextMove,
+  enemyPieces
 
 }: {
   piecesPlayer: Piece[];
@@ -17,7 +18,7 @@ const Player = ({
   setShowNextMove: any;
   pieceSelecteToMove: Piece | undefined;
   setPieceSelecteToMove: any;
-
+  enemyPieces: Piece[]
   showNextMove: string[]
 }) => {
   
@@ -46,10 +47,23 @@ const Player = ({
     for (let i = 0; i < validCol.length; i++) {
       for (let j = 0; j < validRow.length; j++) {
         const createdLocation = validRow[j] + validCol[i];
+        const hasEnemy = enemyPieces.map((piece) => piece.initialPlace).includes(createdLocation)
 
-        type.initialPlace != createdLocation &&
+        type.initialPlace != createdLocation && !hasEnemy &&
           youCanMove.push(createdLocation);
       }
+      
+      const searchEnemyLeft = type.isEnemy ? cols[currentRowIndex - 1] +  `${currentLocation.col + 1}` : cols[currentRowIndex - 1] +  `${currentLocation.col - 1}`;
+     const searchEnemyRight = type.isEnemy ? cols[currentRowIndex + 1] + `${currentLocation.col + 1}` : cols[currentRowIndex + 1] + `${currentLocation.col - 1}`;
+    //  console.log('searchEnemyRight',searchEnemyRight);
+     
+      if (enemyPieces.map((piece) => piece.initialPlace).includes(searchEnemyLeft)) {
+        youCanMove.push(searchEnemyLeft)
+      }
+      if (enemyPieces.map((piece) => piece.initialPlace).includes(searchEnemyRight)) {
+        youCanMove.push(searchEnemyRight)
+      }
+      
     }
   } else if (type.ficha === "caballo") {
     //  vertical
