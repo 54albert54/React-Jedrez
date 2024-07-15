@@ -105,6 +105,7 @@ function App() {
                                           setPieceSelecteToMove
                                         }
                                         pieceSelecteToMove={pieceSelecteToMove}
+                                        showNextMove={ isTurnOfPlayer ? showNextMove : showNextMoveEnemy}
                                       />
                                     )}
                                   </div>
@@ -133,10 +134,9 @@ function App() {
                                       setShowNextMove={setShowNextMoveEnemy}
                                       piecesPlayer={piecesPlayer2}
                                       setPiecesPlayer={setPiecesPlayer2}
-                                      setPieceSelecteToMove={
-                                        setPieceSelecteToMoveEnemy
-                                      }
+                                      setPieceSelecteToMove={setPieceSelecteToMoveEnemy}
                                       pieceSelecteToMove={pieceSelecteToMoveEnemy}
+                                      showNextMove={ isTurnOfPlayer ? showNextMove : showNextMoveEnemy}
                                     />
                                   )}
                                 </div>
@@ -170,7 +170,7 @@ const PaintBoard = ({
     <div
       key={generateRandomString(8)}
       className={`${
-        isBlack ? "bg-white text-black" : "bg-black text-white"
+        isBlack ? "bg-white text-black/60" : "bg-black text-white/60e"
       } relative z-0 row w-16 h-16  flex justify-center items-center  `}
     >
       {location}
@@ -197,7 +197,7 @@ const PlayerSide = ({
 }) => {
 
   const isEnemyInSport = enemyPieces.find(piece => piece.initialPlace === location)
-  showNextMove.includes(location) && console.log('isEnemyInSport',isEnemyInSport);
+  
   
 
   return (
@@ -207,8 +207,8 @@ const PlayerSide = ({
         showNextMove.includes(location) &&
           pieceSelecteToMove !== undefined && (
             <div
-              className={`absolute w-16 h-16 z-50 -top-16 ${
-                isEnemy ? isEnemyInSport ? "bg-red-500" : "bg-red-500/30" : isEnemyInSport ? "bg-green-500" : "bg-green-500/30"
+              className={`absolute w-16 h-16 z-50  ${
+                isEnemy ? isEnemyInSport ? "" : "bg-red-500/30" : isEnemyInSport ? "" : "bg-green-500/30"
               } `}
             ></div>
           )}

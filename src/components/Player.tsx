@@ -9,16 +9,20 @@ const Player = ({
   pieceSelecteToMove,
   piecesPlayer,
   setPieceSelecteToMove,
+  showNextMove
+
 }: {
   piecesPlayer: Piece[];
   type: Piece;
   setShowNextMove: any;
   pieceSelecteToMove: Piece | undefined;
   setPieceSelecteToMove: any;
+
+  showNextMove: string[]
 }) => {
   
 
-  
+  const isEnemyInSport = showNextMove.includes(type.initialPlace)
   
   let youCanMove: string[] = [];
 
@@ -191,9 +195,9 @@ const Player = ({
         validRowRightDown.unshift(cols[currentRowIndex + a]);
     }
 
-    for (let i = 1; i < 8; i++) {
+    for (let i = 0; i < 9; i++) {
       //vertical Up - down
-      youCanMove.push(currentLocation.row + (currentLocation.col - (i -1)));
+      youCanMove.push(currentLocation.row + (currentLocation.col - (i - 1)));
       youCanMove.push(currentLocation.row + (currentLocation.col + (i + 1)));
 
       // horizontal left - right
@@ -243,8 +247,10 @@ const Player = ({
   return (
     <section className="flex flex-col justify-center ">
       <div
-        className={`relative ${
-          type.isEnemy ? " border-red-300" : " border-blue-300"
+        className={`relative 
+          ${isEnemyInSport && "bg-red-600"}
+          ${
+          type.isEnemy ? " border-red-300" : " border-b"
         } z-90 m-auto w-[64px] h-[64px]  border-2  rounded-md   hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
         onClick={() => {
           setShowNextMove(
