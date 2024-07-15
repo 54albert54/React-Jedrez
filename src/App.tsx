@@ -4,6 +4,7 @@ import "./App.css";
 import Player from "./components/Player";
 import { generateRandomString } from "./components/const";
 import { cols, fichasPlayer1, fichasPlayer2, Piece } from "./components/data";
+import { makeAMove } from "./components/moveFunct";
 
 // const aleatoryLocation = (): string => {
 //   const result =
@@ -15,59 +16,7 @@ import { cols, fichasPlayer1, fichasPlayer2, Piece } from "./components/data";
 // const allHearts = [aleatoryLocation(), aleatoryLocation(), aleatoryLocation()];
 const showPlayer = true;
 
-const makeAMove = ({
-  newLocation,
-  showNextMove,
-  pieceSelecteToMove,
-  piecesPlayer,
-  setPiecesPlayer,
-  setPieceSelecteToMove,
-  setShowNextMove,
-  setIsTurnOfPlayer
-}: {
-  newLocation: string;
-  showNextMove: string[];
-  pieceSelecteToMove: Piece | undefined;
-  piecesPlayer: Piece[];
-  setPiecesPlayer: any;
-  setPieceSelecteToMove: any;
-  setShowNextMove: any;
-  setIsTurnOfPlayer: any
-}) => {
-  
-  if (showNextMove.includes(newLocation)) {
-    
-  
-    const oldPieces = piecesPlayer.filter(
-      (piece) => piece.initialPlace !== pieceSelecteToMove?.initialPlace
-    );
 
-    console.log('showNextMove',pieceSelecteToMove);
-
-    if (
-      pieceSelecteToMove !== undefined &&
-      pieceSelecteToMove?.isSelected === true
-    ) {
-      // console.log('makeAMove',showNextMove);
-      const spotIsFree = oldPieces.map((piece) => piece.initialPlace).includes(newLocation);
-      
-      
-      if (!spotIsFree) {
-        const newPicesSet = [
-          ...oldPieces,
-          { ficha: pieceSelecteToMove?.ficha, initialPlace: newLocation },
-        ];
-        setIsTurnOfPlayer(state => !state);
-        setPiecesPlayer(newPicesSet);
-      } else {
-        console.log("is noo free");
-      }
-    }
-
-    setShowNextMove([]);
-    setPieceSelecteToMove(undefined);
-  }
-};
 function App() {
   const [piecesPlayer1, setPiecesPlayer1] = useState<Piece[]>(fichasPlayer1);
   const [piecesPlayer2, setPiecesPlayer2] = useState<Piece[]>(fichasPlayer2);
@@ -123,8 +72,11 @@ function App() {
                               setPiecesPlayer : isTurnOfPlayer ? setPiecesPlayer1 : setPiecesPlayer2,
                               setPieceSelecteToMove : isTurnOfPlayer ? setPieceSelecteToMove : setPieceSelecteToMoveEnemy,
                               setShowNextMove : isTurnOfPlayer ? setShowNextMove : setShowNextMoveEnemy,
-                              setIsTurnOfPlayer
-                            });
+                              setIsTurnOfPlayer,
+                              enemyPieces: isTurnOfPlayer ? piecesPlayer2 : piecesPlayer1,
+                              setEnemyPieces: isTurnOfPlayer ? setPiecesPlayer2 : setPiecesPlayer1,
+
+                              });
                           }}
                           className={` relative  w-16 h-16 border-black border `}
                         >
@@ -137,6 +89,7 @@ function App() {
                               location={location}
                               isEnemy={false}
                               isTurnOfPlayer={isTurnOfPlayer}
+                              enemyPieces={isTurnOfPlayer ? piecesPlayer2 : piecesPlayer1}
                             >
                               {piecesPlayer1.map((piece) => {
                                 piece.isEnemy = false;
@@ -146,7 +99,7 @@ function App() {
                                       <Player
                                         type={piece}
                                         setShowNextMove={setShowNextMove}
-                                        allPiecesPlayer={piecesPlayer1}
+                                        piecesPlayer={piecesPlayer1}
                                         setPiecesPlayer={setPiecesPlayer1}
                                         setPieceSelecteToMove={
                                           setPieceSelecteToMove
@@ -162,11 +115,13 @@ function App() {
 
                           {/* ------------------------------------------------------------------------------- */}
                           <PlayerSide
+                            enemyPieces={isTurnOfPlayer ? piecesPlayer2 : piecesPlayer1}
                             showNextMove={showNextMoveEnemy}
                             pieceSelecteToMove={pieceSelecteToMoveEnemy}
                             location={location}
                             isEnemy={true}
                             isTurnOfPlayer={isTurnOfPlayer}
+                            
                           >
                             {piecesPlayer2.map((piece) => {
                               piece.isEnemy = true;
@@ -176,7 +131,7 @@ function App() {
                                     <Player
                                       type={piece}
                                       setShowNextMove={setShowNextMoveEnemy}
-                                      allPiecesPlayer={piecesPlayer2}
+                                      piecesPlayer={piecesPlayer2}
                                       setPiecesPlayer={setPiecesPlayer2}
                                       setPieceSelecteToMove={
                                         setPieceSelecteToMoveEnemy
@@ -229,7 +184,8 @@ const PlayerSide = ({
   pieceSelecteToMove,
   location,
   isEnemy,
-  isTurnOfPlayer
+  isTurnOfPlayer,
+  enemyPieces
 }: {
   children: React.ReactNode;
   showNextMove: any;
@@ -237,7 +193,13 @@ const PlayerSide = ({
   location: string;
   isEnemy: boolean;
   isTurnOfPlayer: boolean
+  enemyPieces: Piece[]
 }) => {
+
+  const isEnemyInSport = enemyPieces.find(piece => piece.initialPlace === location)
+  showNextMove.includes(location) && console.log('isEnemyInSport',isEnemyInSport);
+  
+
   return (
     <div className="relative bottom-16 z-90">
       <div>
@@ -245,8 +207,8 @@ const PlayerSide = ({
         showNextMove.includes(location) &&
           pieceSelecteToMove !== undefined && (
             <div
-              className={`absolute w-16 h-16 ${
-                isEnemy ? "bg-red-500/60" : "bg-green-500/60"
+              className={`absolute w-16 h-16 z-50 -top-16 ${
+                isEnemy ? isEnemyInSport ? "bg-red-500" : "bg-red-500/30" : isEnemyInSport ? "bg-green-500" : "bg-green-500/30"
               } `}
             ></div>
           )}

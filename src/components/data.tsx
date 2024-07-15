@@ -1,69 +1,48 @@
-const allMoves = () =>{
-  const validCol = [
-    currentLocation.col - 1,
-    currentLocation.col,
-    currentLocation.col + 1,
-  ];
-  const validRow = [
-    cols[currentRowIndex - 1],
-    cols[currentRowIndex],
-    cols[currentRowIndex + 1],
-  ];
-
-  const youCanMove: string[] = [];
-
-  for (let i = 0; i < validCol.length; i++) {
-    for (let j = 0; j < validRow.length; j++) {
-      const createdLocation = validRow[j] + validCol[i];
-
-      type.initialPlace != createdLocation && youCanMove.push(createdLocation);
-    }
-  }
-}
 
 export const cols = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 export interface Piece {
+  idPiece: string;
   ficha: string;
   initialPlace: string;
   isSelected?: boolean;
   isEnemy?: boolean;
 }
 
-export const fichasPlayer1 = [
-  { ficha: "peon", initialPlace: "a7" },
-  { ficha: "peon", initialPlace: "b7" },
-  { ficha: "peon", initialPlace: "c7" },
-  { ficha: "peon", initialPlace: "d7" },
-  { ficha: "peon", initialPlace: "e7" },
-  { ficha: "peon", initialPlace: "f7" },
-  { ficha: "peon", initialPlace: "g7" },
-  { ficha: "peon", initialPlace: "h7" },
-  { ficha: "torre", initialPlace: "a8" },
-  { ficha: "torre", initialPlace: "h8" },
-  { ficha: "caballo", initialPlace: "b8" }, 
-  { ficha: "caballo", initialPlace: "g8" },
-  { ficha: "alfil", initialPlace: "c8" },
-  { ficha: "alfil", initialPlace: "f8" },
-  { ficha: "rey", initialPlace: "d8" },
-  { ficha: "reina", initialPlace: "e8" },
+export const fichasPlayer1: Piece[] = [
+  { ficha: "peon", initialPlace: "a7", idPiece: "7frqtHGA" },
+  { ficha: "peon", initialPlace: "b7", idPiece: "4XXkdK6y" },
+  { ficha: "peon", initialPlace: "c7", idPiece: "DUPCkshs" },
+  { ficha: "peon", initialPlace: "d7", idPiece: "8hxS60KK" },
+  { ficha: "peon", initialPlace: "e7", idPiece: "0hL8OfYW" },
+  { ficha: "peon", initialPlace: "f7", idPiece: "fwnA9gIK" },
+  { ficha: "peon", initialPlace: "g7", idPiece: "g27NM3Lz" },
+  { ficha: "peon", initialPlace: "h7", idPiece: "YiEn5Z1f" },
+  { ficha: "torre", initialPlace: "a8", idPiece: "yUG5v23e" },
+  { ficha: "torre", initialPlace: "h8", idPiece: "6PbZEUoC" },
+  { ficha: "caballo", initialPlace: "b8", idPiece: "FZ2SoHN9" },
+  { ficha: "caballo", initialPlace: "g8", idPiece: "rkfMoeap" },
+  { ficha: "alfil", initialPlace: "c8", idPiece: "sWJWqoJT" },
+  { ficha: "alfil", initialPlace: "f8", idPiece: "RaeHTDaR" },
+  { ficha: "rey", initialPlace: "d8", idPiece: "Y1ewJ8J6" },
+  { ficha: "reina", initialPlace: "e8", idPiece: "cw63CfYg" },
 ];
 
-export  const fichasPlayer2 = [
-  { ficha: "peon", initialPlace: "a2" },
-  { ficha: "peon", initialPlace: "b2" },
-  { ficha: "peon", initialPlace: "c2" },
-  { ficha: "peon", initialPlace: "d2" },
-  { ficha: "peon", initialPlace: "e2" },
-  { ficha: "peon", initialPlace: "f2" },
-  { ficha: "peon", initialPlace: "g2" },
-  { ficha: "peon", initialPlace: "h2" },
-  { ficha: "torre", initialPlace: "a1" },
-  { ficha: "torre", initialPlace: "h1" },
-  { ficha: "caballo", initialPlace: "b1" },
-  { ficha: "caballo", initialPlace: "g1" },
-  { ficha: "alfil", initialPlace: "c1" },
-  { ficha: "alfil", initialPlace: "f1" },
-  { ficha: "rey", initialPlace: "d1" },
-  { ficha: "reina", initialPlace: "e1" },
+export const fichasPlayer2: Piece[] = [
+  { ficha: "peon", initialPlace: "a2", idPiece: "RO5FCzYW" },
+  { ficha: "peon", initialPlace: "b2", idPiece: "DmDg6pMZ" },
+  { ficha: "peon", initialPlace: "c2", idPiece: "pqMYbTSA" },
+  { ficha: "peon", initialPlace: "d2", idPiece: "7wVMVv39" },
+  { ficha: "peon", initialPlace: "e2", idPiece: "4eNv0f26" },
+  { ficha: "peon", initialPlace: "f2", idPiece: "e7jH56Nh" },
+  { ficha: "peon", initialPlace: "g2", idPiece: "oxlOxvTP" },
+  { ficha: "peon", initialPlace: "h2", idPiece: "pLdhQtvS" },
+  { ficha: "torre", initialPlace: "a1", idPiece: "RAJ0BQpl" },
+  { ficha: "torre", initialPlace: "h1", idPiece: "0bIZjz5j" },
+  { ficha: "caballo", initialPlace: "b1", idPiece: "U4rClwpb" },
+  { ficha: "caballo", initialPlace: "g1", idPiece: "yWFSNvVk" },
+  { ficha: "alfil", initialPlace: "c1", idPiece: "tG6d59Ny" },
+  { ficha: "alfil", initialPlace: "f1", idPiece: "K9J9V7Sa" },
+  { ficha: "rey", initialPlace: "d1", idPiece: "3ezzL8Ku" },
+  { ficha: "reina", initialPlace: "e1", idPiece: "aBVWNuyl" },
 ];

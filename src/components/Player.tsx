@@ -7,10 +7,10 @@ const Player = ({
   type,
   setShowNextMove,
   pieceSelecteToMove,
-  allPiecesPlayer,
+  piecesPlayer,
   setPieceSelecteToMove,
 }: {
-  allPiecesPlayer: Piece[];
+  piecesPlayer: Piece[];
   type: Piece;
   setShowNextMove: any;
   pieceSelecteToMove: Piece | undefined;
@@ -28,7 +28,6 @@ const Player = ({
   };
   const currentRowIndex = cols.indexOf(currentLocation.row);
 
-  //reina
 
   if (type.ficha === "peon") {
     const validCol = type.isEnemy ? [
@@ -192,9 +191,9 @@ const Player = ({
         validRowRightDown.unshift(cols[currentRowIndex + a]);
     }
 
-    for (let i = 0; i < 9; i++) {
+    for (let i = 1; i < 8; i++) {
       //vertical Up - down
-      youCanMove.push(currentLocation.row + (currentLocation.col - (i - 1)));
+      youCanMove.push(currentLocation.row + (currentLocation.col - (i -1)));
       youCanMove.push(currentLocation.row + (currentLocation.col + (i + 1)));
 
       // horizontal left - right
@@ -245,13 +244,13 @@ const Player = ({
     <section className="flex flex-col justify-center ">
       <div
         className={`relative ${
-          type.isEnemy ? "bg-slate-600" : "bg-gray-500"
-        } z-40 m-auto w-[64px] h-[64px]  border-2  rounded-md   hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
+          type.isEnemy ? " border-red-300" : " border-blue-300"
+        } z-90 m-auto w-[64px] h-[64px]  border-2  rounded-md   hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
         onClick={() => {
           setShowNextMove(
             uniqueElements(
               youCanMove,
-              allPiecesPlayer.map((piece) => piece.initialPlace)
+              piecesPlayer.map((piece) => piece.initialPlace)
             )
           );
         
