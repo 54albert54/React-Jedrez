@@ -89,55 +89,7 @@ export const makeAMove = ({
    
   }
 
-  if (false) {
-    if (showNextMove.includes(newLocation)) {
-      const oldPieces = piecesPlayer.filter(
-        (piece) => piece.initialPlace !== pieceSelecteToMove?.initialPlace
-      );
   
-      if (
-        pieceSelecteToMove !== undefined &&
-        pieceSelecteToMove?.isSelected === true
-      ) {
-        
-      
-         
-        const isNotFreeEnemy = enemyPieces.find(
-          (piece) => piece.initialPlace === newLocation
-        );
-  
-        if (isNotFreeEnemy) {
-          const newEnemyPieces = enemyPieces.filter(
-            (piece) => piece.initialPlace !== isNotFreeEnemy.initialPlace
-          );
-          setEnemyPieces(newEnemyPieces);
-        }
-  
-        // if (spotIsFree) {
-          const newPicesSet = [
-            ...oldPieces,
-            {
-              ...pieceSelecteToMove,
-              initialPlace: newLocation,
-              isSelected: false,
-            },
-          ];
-          setIsTurnOfPlayer((state) => !state);
-          setPiecesPlayer(newPicesSet);
-  
-          setPieceSelecteToMove(undefined);
-          setPieceSelecteToMoveEnemy(undefined);
-  
-        // } else {
-        //   console.log("is noo free");
-        // }
-      }
-  
-      setShowNextMove([]);
-      setPieceSelecteToMove(undefined);
-      setPieceSelecteToMoveEnemy(undefined);
-    }
-   }
    setPieceSelecteToMoveEnemy(undefined);
     // setClearNextMoveEnemy([]);
  

@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { cols, type Piece } from "./data";
+import { uniqueElements } from "./const";
 
 const movePiecePeon = ({
   type,
@@ -23,11 +24,11 @@ const movePiecePeon = ({
     
     const validCol = !type.isEnemy ? [
      
-      currentLocation.col - 1,
-      Number(type.initialPlace[1]) == 7 && currentLocation.col - 2,
-    ]:[
       currentLocation.col + 1,
       Number(type.initialPlace[1]) == 2 && currentLocation.col + 2,
+    ]:[
+      currentLocation.col - 1,
+      Number(type.initialPlace[1]) == 7 && currentLocation.col - 2,
     ]
     const validRow = [cols[currentRowIndex]];
 
@@ -53,11 +54,14 @@ const movePiecePeon = ({
 
 
     const searchEnemyLeft = type.isEnemy
-      ? cols[currentRowIndex - 1] + `${currentLocation.col + 1}`
-      : cols[currentRowIndex - 1] + `${currentLocation.col - 1}`;
+      ? cols[currentRowIndex - 1] + `${currentLocation.col - 1}`
+      : cols[currentRowIndex - 1] + `${currentLocation.col + 1}`;
+
+   
+      
     const searchEnemyRight = type.isEnemy
-      ? cols[currentRowIndex + 1] + `${currentLocation.col + 1}`
-      : cols[currentRowIndex + 1] + `${currentLocation.col - 1}`;
+      ? cols[currentRowIndex + 1] + `${currentLocation.col - 1}`
+      : cols[currentRowIndex + 1] + `${currentLocation.col + 1}`;
     //  console.log('searchEnemyRight',searchEnemyRight);
 
     if (
@@ -305,8 +309,10 @@ const Player = ({
   ];
 
   const isEnemyInSport = showNextMove.includes(type.initialPlace);
-  const isPieceSelected = type.idPiece === pieceSelecteToMove?.idPiece;
-
+  
+  const dataCamaradeOnly = uniqueElements(showNextMove ,enemyPieces.map((piece) => piece.initialPlace));
+ 
+  
   let youCanMove: string[] = [];
 
   const currentLocation = {
@@ -373,19 +379,21 @@ const Player = ({
   }
 
   return (
-    <section className="flex flex-col justify-center ">
+    <section className="flex flex-col justify-center items-center ">
       <div
         className={`relative 
+          ${isTurnOfPlayer === !type.isEnemy && !(isTurnOfPlayer === !type.isEnemy &&
+            pieceSelecteToMove?.idPiece === type.idPiece) ? " border-yellow-500" : " border-transparent"}
           ${
             isTurnOfPlayer === !type.isEnemy &&
             pieceSelecteToMove?.idPiece === type.idPiece
               ? "bg-yellow-600"
               : ""
           }
-          ${isEnemyInSport && "bg-red-600"}
+          ${isEnemyInSport   && dataCamaradeOnly.includes(type.initialPlace) ? "bg-red-600" : ""}
           ${
-            type.isEnemy ? " border-red-300" : " border-b"
-          } z-90 m-auto w-[64px] h-[64px]  border-2  rounded-md   hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
+            type.isEnemy ? " " : " "
+          } z-90 m-auto w-[64px] h-[64px]  border-[4px]      hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
         onClick={() => {
           setShowNextMove(youCanMove);
 
