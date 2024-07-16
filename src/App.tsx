@@ -21,8 +21,8 @@ function App() {
   const [piecesPlayer1, setPiecesPlayer1] = useState<Piece[]>(fichasPlayer1);
   const [piecesPlayer2, setPiecesPlayer2] = useState<Piece[]>(fichasPlayer2);
   const [pieceSelecteToMove, setPieceSelecteToMove] = useState<Piece>();
-  const [isTurnOfPlayer, setIsTurnOfPlayer] = useState(true); 
   const [pieceSelecteToMoveEnemy, setPieceSelecteToMoveEnemy] =useState<Piece>();
+  const [isTurnOfPlayer, setIsTurnOfPlayer] = useState(true); 
 
   const [showNextMove, setShowNextMove] = useState([]);
   const [showNextMoveEnemy, setShowNextMoveEnemy] = useState([]);
@@ -31,6 +31,8 @@ function App() {
     <main>
       <section className="w-[800px] border  flex flex-col  mx-auto mt-20   relative  select-none">
         <p className="text-center"> is Turn of {isTurnOfPlayer ? "player1" : "player2"}</p>
+        <p>Pieces Player 1: {piecesPlayer1.length}</p>
+        <p>Pieces Player 2: {piecesPlayer2.length}</p>
         {/* <div className="flex flex-row ">
           {cols.map((col) => (
             <div
@@ -71,10 +73,12 @@ function App() {
                               piecesPlayer: isTurnOfPlayer ? piecesPlayer1 : piecesPlayer2,
                               setPiecesPlayer : isTurnOfPlayer ? setPiecesPlayer1 : setPiecesPlayer2,
                               setPieceSelecteToMove : isTurnOfPlayer ? setPieceSelecteToMove : setPieceSelecteToMoveEnemy,
+                              setPieceSelecteToMoveEnemy : isTurnOfPlayer ? setPieceSelecteToMoveEnemy : setPieceSelecteToMove,
                               setShowNextMove : isTurnOfPlayer ? setShowNextMove : setShowNextMoveEnemy,
                               setIsTurnOfPlayer,
                               enemyPieces: isTurnOfPlayer ? piecesPlayer2 : piecesPlayer1,
                               setEnemyPieces: isTurnOfPlayer ? setPiecesPlayer2 : setPiecesPlayer1,
+                              setClearNextMoveEnemy : isTurnOfPlayer ? setShowNextMoveEnemy : setShowNextMove
 
                               });
                           }}
@@ -98,6 +102,7 @@ function App() {
                                     {piece.initialPlace === location && (
                                       <Player
                                         type={piece}
+                                        isTurnOfPlayer={isTurnOfPlayer}
                                         setShowNextMove={setShowNextMove}
                                         piecesPlayer={piecesPlayer1}
                                         setPiecesPlayer={setPiecesPlayer1}
@@ -132,6 +137,7 @@ function App() {
                                   {piece.initialPlace === location && (
                                     <Player
                                       type={piece}
+                                      isTurnOfPlayer={isTurnOfPlayer}
                                       setShowNextMove={setShowNextMoveEnemy}
                                       piecesPlayer={piecesPlayer2}
                                       setPiecesPlayer={setPiecesPlayer2}
@@ -220,3 +226,8 @@ const PlayerSide = ({
     </div>
   );
 };
+
+
+// if (ocupedSpot.includes(createdLocation)) {
+//   break; // Termina el bucle si se encuentra una ubicación ocupada
+// }
