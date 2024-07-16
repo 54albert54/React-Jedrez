@@ -3,7 +3,13 @@ import { useState } from "react";
 import "./App.css";
 import Player from "./components/Player";
 import { generateRandomString } from "./components/const";
-import { cols, fichasPlayer1, fichasPlayer2, Piece } from "./components/data";
+import {
+  cols,
+  fichasPlayer1,
+  fichasPlayer2,
+  peonCanChangeTo,
+  Piece,
+} from "./components/data";
 import { makeAMove } from "./components/moveFunct";
 
 // const aleatoryLocation = (): string => {
@@ -16,6 +22,39 @@ import { makeAMove } from "./components/moveFunct";
 // const allHearts = [aleatoryLocation(), aleatoryLocation(), aleatoryLocation()];
 const showPlayer = true;
 
+const changePeonInGoal = ({
+  pieces,
+  change,
+  alertArea,
+  ownAlert,
+  savePices,
+  setChangeTurn
+}: {
+  pieces: Piece[];
+  alertArea: any;
+  ownAlert: any;
+change:string
+savePices: any
+setChangeTurn: any
+}) => {
+
+ 
+
+  const peonId = pieces.find((piece) => (piece.ficha === 'peon'&& piece.initialPlace[1] === '8' )|| (piece.ficha === 'peon' && piece.initialPlace[1] === '1'));
+  const oldPieces = pieces.filter((piece) => piece.initialPlace !== peonId?.initialPlace);
+  console.log('oldPieces',peonId);
+  
+  const changePeon = [...oldPieces, { ...peonId, ficha: change }];
+   console.log('changePeon',changePeon);
+  
+   savePices(changePeon);
+setTimeout(() => {
+  alertArea(false);
+  ownAlert(false);
+},500)
+  // setChangeTurn(state => !state);
+};
+
 function App() {
   const [piecesPlayer1, setPiecesPlayer1] = useState<Piece[]>(fichasPlayer1);
   const [piecesPlayer2, setPiecesPlayer2] = useState<Piece[]>(fichasPlayer2);
@@ -26,11 +65,47 @@ function App() {
 
   const [showNextMove, setShowNextMove] = useState([]);
   const [showNextMoveEnemy, setShowNextMoveEnemy] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
+  const [peonIsGoal, setPeonIsGoal] = useState(false);
 
   return (
     <main>
-      <section className="w-[800px] h-[265px]   flex flex-col  mx-auto mt-20   relative  select-none ">
-        
+      <section className=" w-screen max-w-[800px] h-full   flex flex-col  mx-auto mt-20   relative  select-none ">
+        {showAlert && (
+          <section className="absolute z-50 w-full h-full bg-black/40  rounded-md shadow-2xl ">
+            {peonIsGoal && (
+              <section className="absolute z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 ">
+                <p className=" text-center font-semibold text-xl ">
+                  Elige una Pieza
+                </p>
+                <ul className=" ">
+                  {peonCanChangeTo.map((piece) => (
+                    <li
+                      key={generateRandomString(8)}
+                      onClick={() =>
+                        changePeonInGoal({
+                          pieces: !isTurnOfPlayer
+                          ? piecesPlayer1
+                          : piecesPlayer2,
+                          change: piece,
+                          alertArea: setShowAlert,
+                          ownAlert: setPeonIsGoal,
+                          savePices:!isTurnOfPlayer
+                          ? setPiecesPlayer1
+                          : setPiecesPlayer2,
+                          setChangeTurn: setIsTurnOfPlayer
+                        })
+                      }
+                      className="flex justify-center items-center cursor-pointer my-4  bg-white w-32 mx-auto rounded-full border   border-emerald-500 px-2.5 py-0.5 text-emerald-700 active:bg-emerald-400 active:text-teal-50 hover:bg-emerald-300 shadow-md"
+                    >
+                      {piece}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </section>
+        )}
         {/* <div className="flex flex-row ">
           {cols.map((col) => (
             <div
@@ -41,7 +116,7 @@ function App() {
             </div>
           ))}
         </div> */}
-        <section className="flex border border-black ">
+        <section className="flex flex-col sm:flex-row border border-black ">
           {/* <div className="flex flex-col ">
             {cols.map((_, ind) => (
               <div key={generateRandomString(8)} className="col h-16   justify-center items-center">
@@ -99,7 +174,7 @@ function App() {
                                 : setShowNextMove,
                             });
                           }}
-                          className={` relative  w-16 h-16  `}
+                          className={` relative w-[54px] h-[54px]   sm:w-16 sm:h-16  `}
                         >
                           <PaintBoard isBlack={isBlack} location={location} />
 
@@ -140,6 +215,8 @@ function App() {
                                             ? piecesPlayer2
                                             : piecesPlayer1
                                         }
+                                        setShowAlert={setShowAlert}
+                                        setPeonIsGoal={setPeonIsGoal}
                                       />
                                     )}
                                   </div>
@@ -187,6 +264,8 @@ function App() {
                                           ? piecesPlayer2
                                           : piecesPlayer1
                                       }
+                                      setShowAlert={setShowAlert}
+                                      setPeonIsGoal={setPeonIsGoal}
                                     />
                                   )}
                                 </div>
@@ -203,27 +282,45 @@ function App() {
           </div>
 
           <section id="UI" className="w-full h-full bg-red-400 ">
-          <div id="turn" className="bg-blue-l200  w-full h-5/6">d</div>
-          <div className="bg-blue-100 w-full h-1/6 relative bottom-6 ">
-          <p className="text-center">
-            {" "}
-            is Turn of {isTurnOfPlayer ? "Blancas" : "Negras"}
-          </p>
-          <div className="flex justify-around bg-red-900 h-full py-4 ">
-          <p className={`
-             ${isTurnOfPlayer ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-12" : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-10 border"} 
+            <div id="turn" className="bg-blue-l200  w-full h-5/6">
+              d
+            </div>
+            <div className="bg-blue-100 w-full h-1/6 relative bottom-6 ">
+              <p className="text-center">
+                {" "}
+                is Turn of {isTurnOfPlayer ? "Blancas" : "Negras"}
+              </p>
+              <div className="flex justify-around bg-red-900 h-full py-4 ">
+                <p
+                  className={`
+             ${
+               isTurnOfPlayer
+                 ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-12"
+                 : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-10 border"
+             } 
              inline-flex items-center justify-center rounded-full  px-2.5 py-0.5 border  transition-all duration-200 ease-in-out
-             `}>Blancas: {piecesPlayer1.length}</p>
-          <p className="flex h-full justify-center items-center">{isTurnOfPlayer ? "<" : ">"}</p>
-          <p
-          className={`
-            ${!isTurnOfPlayer ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-12" : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-10 border"} "}
+             `}
+                >
+                  Blancas: {piecesPlayer1.length}
+                </p>
+                <p className="flex h-full justify-center items-center">
+                  {isTurnOfPlayer ? "<" : ">"}
+                </p>
+                <p
+                  className={`
+            ${
+              !isTurnOfPlayer
+                ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-12"
+                : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-10 border"
+            } "}
             inline-flex items-center justify-center rounded-full    transition-all duration-200 ease-in-out
             `}
-          >Negras: {piecesPlayer2.length}</p>
-          </div>
-          </div>
-        </section>
+                >
+                  Negras: {piecesPlayer2.length}
+                </p>
+              </div>
+            </div>
+          </section>
         </section>
       </section>
     </main>
@@ -244,7 +341,7 @@ const PaintBoard = ({
       key={generateRandomString(8)}
       className={`${
         isBlack ? "bg-white text-black/60" : "bg-black text-white/60"
-      } relative z-0 row w-16 h-16  flex justify-center items-center  `}
+      } relative z-0 row w-[54px] h-[54px]   sm:w-16 sm:h-16   flex justify-center items-center  `}
     >
       {location}
     </div>
@@ -282,7 +379,7 @@ const PlayerSide = ({
           !piecesPlayer.map((piece) => piece.initialPlace).includes(location) &&
           pieceSelecteToMove !== undefined && (
             <div
-              className={`absolute w-16 h-16 z-50  ${
+              className={`absolute w-[54px] h-[54px]   sm:w-16 sm:h-16  z-50  ${
                 isEnemy
                   ? isEnemyInSport
                     ? ""
@@ -301,5 +398,3 @@ const PlayerSide = ({
 };
 
 // UI
-
-

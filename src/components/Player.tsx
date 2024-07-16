@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cols, type Piece } from "./data";
 import { uniqueElements } from "./const";
@@ -10,12 +10,14 @@ const movePiecePeon = ({
   enemyPieces,
   currentRowIndex,
 
+
 }: {
   type: Piece;
   currentLocation: { row: string; col: number };
   youCanMove: string[];
   enemyPieces: Piece[];
   currentRowIndex: number;
+
  
 }) => {
   
@@ -41,6 +43,7 @@ const movePiecePeon = ({
           .map((piece) => piece.initialPlace)
           .includes(createdLocation);
         
+
   
         type.initialPlace != createdLocation &&
           !hasEnemy &&
@@ -178,7 +181,7 @@ const movePieceInCruz = ({
       break; // Termina el bucle si se encuentra una ubicación ocupada
     }
   }
-  for (let i = currentLocation.col + 1; i < 8; i++) {
+  for (let i = currentLocation.col + 1; i < 9; i++) {
     //vertical  down
 
     const createdLocation = currentLocation.row + i;
@@ -293,6 +296,8 @@ const Player = ({
   showNextMove,
   enemyPieces,
   isTurnOfPlayer,
+  setShowAlert,
+  setPeonIsGoal
 }: {
   piecesPlayer: Piece[];
   type: Piece;
@@ -302,6 +307,8 @@ const Player = ({
   enemyPieces: Piece[];
   showNextMove: string[];
   isTurnOfPlayer: boolean;
+  setShowAlert: any
+  setPeonIsGoal:any
 }) => {
   const ocupedSpot = [
     ...piecesPlayer.map((piece) => piece.initialPlace),
@@ -321,6 +328,17 @@ const Player = ({
   };
   const currentRowIndex = cols.indexOf(currentLocation.row);
 
+useEffect(()=>{
+    // check where is peon piece
+    if (type.ficha === "peon" && ( currentLocation.col === 1 || currentLocation.col === 8) ) {
+      
+       setShowAlert(true)
+       setPeonIsGoal(true)
+    }
+  
+},[piecesPlayer])
+
+
   if (type.ficha === "peon") {
     movePiecePeon({
       type,
@@ -328,6 +346,7 @@ const Player = ({
       youCanMove,
       enemyPieces,
       currentRowIndex,
+
     });
   } else if (type.ficha === "caballo") {
     movePieceCaballo({
@@ -381,7 +400,7 @@ const Player = ({
   return (
     <section className="flex flex-col justify-center items-center ">
       <div
-        className={`relative 
+        className={`relative top-[10px]  sm:top-0 
           ${isTurnOfPlayer === !type.isEnemy && !(isTurnOfPlayer === !type.isEnemy &&
             pieceSelecteToMove?.idPiece === type.idPiece) ? " border-yellow-500" : " border-transparent"}
           ${
@@ -393,7 +412,7 @@ const Player = ({
           ${isEnemyInSport   && dataCamaradeOnly.includes(type.initialPlace) ? "bg-red-600" : ""}
           ${
             type.isEnemy ? " " : " "
-          } z-90 m-auto w-[64px] h-[64px]  border-[4px]      hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
+          } z-90  w-[54px] h-[54px]   sm:w-16 sm:h-16   border-[4px]      hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
         onClick={() => {
           setShowNextMove(youCanMove);
 
