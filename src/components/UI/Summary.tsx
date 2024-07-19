@@ -90,12 +90,7 @@ const Summary = ({
         </div>
 
         <div className="flex justify-center my-4 ">
-          <button
-            className=" bg-red-800 hover:bg-red-900     text-white font-bold py-2 px-4 rounded"
-            onClick={() => window.location.reload()}
-          >
-            resse
-          </button>
+         
         </div>
       </div>
     </section>

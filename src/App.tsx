@@ -3,15 +3,9 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Player from "./components/Player";
 import { generateRandomString } from "./components/const";
-import {
-  cols,
-  fichasPlayer1,
-  fichasPlayer2,
-  Piece,
-} from "./components/data";
+import { cols, fichasPlayer1, fichasPlayer2, Piece } from "./components/data";
 import { makeAMove } from "./components/moveFunct";
 import Summary from "./components/UI/Summary";
-
 
 import ChangePeonWindow from "./components/UI/ChangePeonWindow.tsx";
 import UCIBoard from "./components/UI/UCIBoard.tsx";
@@ -21,7 +15,6 @@ import PlayerSide from "./components/UI/PlayerSide.tsx";
 import PaintBoard from "./components/UI/PaintBoard.tsx";
 import CoverBoard from "./components/UI/CoverBoard.tsx";
 import TheKingIsFallen from "./components/UI/TheKingIsFallen.tsx";
-
 
 const showPlayer = true;
 
@@ -36,26 +29,34 @@ function App() {
   const [showNextMove, setShowNextMove] = useState<string[]>([]);
   const [showNextMoveEnemy, setShowNextMoveEnemy] = useState<string[]>([]);
 
-
-
   const [showAlert, setShowAlert] = useState(true);
   const [peonIsGoal, setPeonIsGoal] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [isFinshedGame, setIsFinshedGame] = useState(false);
 
-  
   const [isCheckMate, setIsCheckMate] = useState(false);
   const [playerVSPlayer, setPlayerVSPlayer] = useState(true);
- 
 
   const [peonInGolLocation, setPeonInGolLocation] = useState("");
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
 
+  const {
+    startGame,
+    setStartGame,
+    playHistory,
+    saveInHistory,
+    lastPieceMovedIA,
+    setLastPieceMovedIA,
+    allmoves,
+    makeUserMove,
+    IAMakeMove,
+    kingIsInHake,
+    showBoard,
+  } = useGameContext();
 
-const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, setLastPieceMovedIA , allmoves, makeUserMove, IAMakeMove, kingIsInHake ,showBoard } = useGameContext()
+  const [showAllMoves, setShowAllMoves] = useState(false);
 
-
-
-const [showAllMoves, setShowAllMoves] = useState(false);
+  const [showReumen , setShowReumen] = useState(false);
 
   const resetAlert = () => {
     setShowAlert(false);
@@ -74,7 +75,6 @@ const [showAllMoves, setShowAllMoves] = useState(false);
     if (!playerVSPlayer && !isTurnOfPlayer && allmoves.length > 0) {
       setShowAlert(true);
       const result = IAMakeMove();
-      
 
       if (result.moveIsKill) {
         const piecePlayerToRemove = piecesPlayer1.filter(
@@ -89,7 +89,6 @@ const [showAllMoves, setShowAllMoves] = useState(false);
       );
       // setShowNextMoveEnemy([result])
 
-      
       setLastPieceMovedIA(seletedEnemyPiece?.idPiece || "");
       setPieceSelecteToMoveEnemy(seletedEnemyPiece);
 
@@ -104,17 +103,15 @@ const [showAllMoves, setShowAllMoves] = useState(false);
       setPiecesPlayer2(updatedEnemyPieces as Piece[]);
       setIsTurnOfPlayer(true);
       setShowAlert(false);
-      saveInHistory(result.moveSaved)
+      saveInHistory(result.moveSaved);
     }
-
-
   }, [isTurnOfPlayer, piecesPlayer2]);
 
   const kingWasDeath = () => {
     setIsFinshedGame(true);
     setShowAlert(true);
   };
- 
+
   useEffect(() => {
     if (kingIsInHake) {
       if (isTurnOfPlayer) {
@@ -131,18 +128,52 @@ const [showAllMoves, setShowAllMoves] = useState(false);
     }
   }, [kingIsInHake]);
 
+  const showAllPices = (fichas: Piece[], title: string) => {
+    const dataPices: Record<string, number> = {
+      peon: 0,
+      torre: 0,
+      caballo: 0,
+      alfil: 0,
+      rey: 0,
+      reina: 0,
+    };
+
+    for (let i = 0; i < fichas.length; i++) {
+      const piece = fichas[i];
+      dataPices[piece.ficha] += 1;
+    }
+
+    return (
+      <div className="w-full flex flex-col h-16 justify-center  gap-3 my-2">
+        <p
+          className={` ${
+            title !== "Black" ? "text-black bg-slate-100" : "text-white bg-black"
+          } w-32 mx-auto border border-black p-1 rounded-lg shadow-lg `}
+        >
+          {title}
+        </p>
+
+        <div className="w-full flex justify-center  gap-3 px-4">
+          <p>reina: <span className={`${dataPices.reina <= 0 ? "text-red-500" : ""}`}>{dataPices.reina}</span></p>
+          <p>alfil: <span className={`${dataPices.alfil <= 0 ? "text-red-500" : ""}`}>{dataPices.alfil}</span></p>
+          <p>caballo: <span className={`${dataPices.caballo <= 0 ? "text-red-500" : ""}`}>{dataPices.caballo}</span></p>
+          <p>torre: <span className={`${dataPices.torre <= 0 ? "text-red-500" : ""}`}>{dataPices.torre}</span></p>
+          <p>peon: <span className={`${dataPices.peon <= 0 ? "text-red-500" : ""}`}>{dataPices.peon}</span></p>
+          
+        </div>
+      </div>
+    );
+  };
+
   return (
     <main>
-      
-      
       <section className=" w-screen max-w-[514px] h-full   flex flex-col  mx-auto mt-20    relative  select-none ">
         <div className="w-full flex justify-center h-5">
-      {
-        playHistory.length > 0 && <p>Last move { playHistory[playHistory.length - 1]}</p>
-    }
-    
-    </div>
-    
+          {playHistory.length > 0 && (
+            <p>Last move {playHistory[playHistory.length - 1]}</p>
+          )}
+        </div>
+
         <CoverBoard showAlert={showAlert}>
           {peonIsGoal && (
             <ChangePeonWindow
@@ -170,7 +201,7 @@ const [showAllMoves, setShowAllMoves] = useState(false);
               }}
             >
               <UCIBoard {...{ showBoard }} />
-              </Summary>
+            </Summary>
           )}
           {isFinshedGame && <TheKingIsFallen {...{ isCheckMate }} />}
           {isCheckMate && <TheKingIsFallen {...{ isCheckMate }} />}
@@ -181,10 +212,7 @@ const [showAllMoves, setShowAllMoves] = useState(false);
           )}
         </CoverBoard>
 
-       
         <section className="flex flex- sm:flex-row border border-black ">
-          
-
           <div className="">
             {cols.map((_, indexRow) => (
               <div
@@ -243,7 +271,7 @@ const [showAllMoves, setShowAllMoves] = useState(false);
                             setShowAlert,
                             setPeonIsGoal,
                             setPeonInGolLocation,
-                            allmoves
+                            allmoves,
                           });
                         !playerVSPlayer &&
                           isTurnOfPlayer &&
@@ -268,7 +296,7 @@ const [showAllMoves, setShowAllMoves] = useState(false);
                             setShowAlert,
                             setPeonIsGoal,
                             setPeonInGolLocation,
-                            allmoves
+                            allmoves,
                           });
                       }}
                       className={` relative w-[54px] h-[54px]   sm:w-16 sm:h-16  `}
@@ -298,7 +326,6 @@ const [showAllMoves, setShowAllMoves] = useState(false);
                                     isTurnOfPlayer={isTurnOfPlayer}
                                     setShowNextMove={setShowNextMove}
                                     piecesPlayer={piecesPlayer1}
-
                                     setPieceSelecteToMove={
                                       setPieceSelecteToMove
                                     }
@@ -313,8 +340,6 @@ const [showAllMoves, setShowAllMoves] = useState(false);
                                         ? piecesPlayer2
                                         : piecesPlayer1
                                     }
-
-
                                   />
                                 )}
                               </div>
@@ -353,7 +378,6 @@ const [showAllMoves, setShowAllMoves] = useState(false);
                                   isTurnOfPlayer={isTurnOfPlayer}
                                   setShowNextMove={setShowNextMoveEnemy}
                                   piecesPlayer={piecesPlayer2}
-
                                   setPieceSelecteToMove={
                                     setPieceSelecteToMoveEnemy
                                   }
@@ -368,8 +392,6 @@ const [showAllMoves, setShowAllMoves] = useState(false);
                                       ? piecesPlayer2
                                       : piecesPlayer1
                                   }
-
-            
                                   lastPieceMovedIA={lastPieceMovedIA}
                                 />
                               )}
@@ -385,23 +407,54 @@ const [showAllMoves, setShowAllMoves] = useState(false);
           </div>
         </section>
       </section>
-     {showAllMoves && <div className="flex-wrap px-20 sm:px-40 mt-10 flex justify-center gap-3 border-slate-950 w-full text-center text-[12px]">
-      <div className="bg-slate-300 rounded-lg shadow-sm border-dotted border-2 p-2">
-        <p className="">N: caballo R: torre  B: alfil  Q: reina  R: rey</p>
-        <p>si termina en  '+' es hake</p>
-        <p>si termina en  '#' es mate</p>
-        <p>posicion inicial 'x' pocion final es comer una piesa  </p>
-        <p>h8=Q peon por reina etc</p>
-        </div>
+      {showAllMoves && (
+        <div className="flex-wrap px-20 sm:px-40 mt-4 flex justify-center gap-3 border-slate-950 w-full text-center text-[12px]">
+          
+          
+         <div className="flex-wrap overflow-scroll text-ellipsis h-[150px]  flex justify-center gap-3 border-slate-950 p-6  bg-red-100 rounded-lg font-semibold text-sm shadow-sm border-2">
+          {allmoves.map((move, index) => {
+            return <p key={index}>{move}</p>;
+          })}
+          </div>
 
-        {
-          allmoves.map((move, index) => {
-            return <p key={index}>{move}</p>
-          })
-        }
-      </div>}
+         
+          <div className="w-full flex flex-col justify-center gap-3">
+          <div 
+          onClick={() => setShowReumen(!showReumen)}
+          className="bg-gray-300 rounded-lg shadow-sm border-dotted border-2 flex flex-col py-4 transition-all">
+            {showReumen ? (
+              <>
+              {showAllPices(piecesPlayer2, "Black")}
+            {showAllPices(piecesPlayer1, "White")}
+            </>
+            ):(<p> Resumen </p>)}
+          </div>
+          <div 
+          onClick={() => setShowMoreInfo(!showMoreInfo)}
+          className="bg-blue-300 rounded-lg shadow-sm border-dotted border-2 py-4 transition-all ">
+            {
+              showMoreInfo ? (
+                <div className="pl-3 text-left">
+                <p className="">N: caballo R: torre B: alfil Q: reina R: rey</p>
+                <p>si termina en '+' es hake</p>
+                <p>si termina en '#' es mate</p>
+                <p>posicion inicial 'x' pocion final es comer una piesa </p>
+                <p>h8=Q peon por reina etc</p>
+                </div>
+                ):( <p> Reglas </p>)
+            }
+          </div>
+          </div>
+
+        </div>
+      )}
       <div className="flex justify-center mt-9 ">
-        <button className="bg-blue-500  mr-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setShowAllMoves((state) => (state ? false : true))}>Movimientos</button>
+        <button
+          className="bg-blue-500  mr-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => setShowAllMoves((state) => (state ? false : true))}
+        >
+          Movimientos
+        </button>
 
         <button
           className={`  ${
@@ -423,15 +476,3 @@ const [showAllMoves, setShowAllMoves] = useState(false);
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
