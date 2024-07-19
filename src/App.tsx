@@ -55,6 +55,8 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
 
 
 
+const [showAllMoves, setShowAllMoves] = useState(false);
+
   const resetAlert = () => {
     setShowAlert(false);
     setPeonIsGoal(false);
@@ -383,14 +385,24 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
           </div>
         </section>
       </section>
-      {/* <div className="flex-wrap px-20 sm:px-40 mt-10 bg-blue-700 flex justify-center gap-3 w-full">
+     {showAllMoves && <div className="flex-wrap px-20 sm:px-40 mt-10 flex justify-center gap-3 border-slate-950 w-full text-center text-[12px]">
+      <div className="bg-slate-300 rounded-lg shadow-sm border-dotted border-2 p-2">
+        <p className="">N: caballo R: torre  B: alfil  Q: reina  R: rey</p>
+        <p>si termina en  '+' es hake</p>
+        <p>si termina en  '#' es mate</p>
+        <p>posicion inicial 'x' pocion final es comer una piesa  </p>
+        <p>h8=Q peon por reina etc</p>
+        </div>
+
         {
           allmoves.map((move, index) => {
             return <p key={index}>{move}</p>
           })
         }
-      </div> */}
+      </div>}
       <div className="flex justify-center mt-9 ">
+        <button className="bg-blue-500  mr-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setShowAllMoves((state) => (state ? false : true))}>Movimientos</button>
+
         <button
           className={`  ${
             showSummary

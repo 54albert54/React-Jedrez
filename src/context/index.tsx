@@ -108,7 +108,7 @@ const IAMakeMove = () => {
   let moveSaved: string;
 
   const moves = controlBoard.moves();
-  const move = moves[Math.floor(Math.random() * moves.length)];
+  const move = moves[Math.floor(Math.random() * moves.length)] == 'O-O' ? moves[Math.floor(Math.random() * moves.length)] : moves[Math.floor(Math.random() * moves.length)];
 
   const moveCanBeKill = moves.find((m) => m[1] === "x");
 

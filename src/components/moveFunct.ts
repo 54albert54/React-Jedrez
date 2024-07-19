@@ -1,4 +1,5 @@
-import {  piecesToUci } from "./chessIA";
+
+import { piecesToUci } from "./chessIA";
 import {  Piece } from "./data";
 import { Dispatch, SetStateAction } from 'react';
 
