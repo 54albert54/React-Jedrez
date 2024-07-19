@@ -1,5 +1,5 @@
 import { piecesToUci } from "./chessIA";
-import { HistoryMove, Piece } from "./data";
+import {  Piece } from "./data";
 import { Dispatch, SetStateAction } from 'react';
 
 
@@ -36,7 +36,7 @@ export const makeAMove = ({
   setEnemyPieces: (piecesPlayer: Piece[]) => void;
   setPieceSelecteToMoveEnemy: (pieceSelecteToMove: Piece | undefined) => void;
   setClearNextMoveEnemy: React.Dispatch<React.SetStateAction<string[]>>;
-  saveInHistory:({newLocation,owner , piece }:HistoryMove)=>void
+  saveInHistory:(a:string)=>void
   kingWasDeath:()=>void
   makeUserMove:(uci:string)=>void
   playerVSPlayer:boolean
@@ -72,15 +72,10 @@ export const makeAMove = ({
       return
     }
 
-    const savedata:HistoryMove = {
-      newLocation:pieceSelecteToMove?.initialPlace + newLocation,
-      owner : pieceSelecteToMove?.isEnemy ? "negras" : "blancas" ,
-      piece : pieceSelecteToMove?.ficha as string
-    }
     
-    const isPeonUCI  = savedata.piece === "peon"
+    const isPeonUCI  = pieceSelecteToMove?.ficha === "peon"
     
-    saveInHistory(savedata)
+   
 
        // delete a enemy piece at new location
     const isEnemyInNextLocation = enemyPieces.find(
@@ -91,12 +86,11 @@ export const makeAMove = ({
     if (isEnemyInNextLocation) {
       isKill = isPeonUCI ? `${pieceSelecteToMove?.initialPlace[0]}x` : 'x'
      
-      saveInHistory({...savedata ,newLocation:"kill a " + isEnemyInNextLocation.ficha })
-     
+      
     }
     // const nameIsValid:PieceName = piecesToUci[savedata!.piece] as PieceName
 
-    const transFormToUCI = `${ isPeonUCI ?'' : `${piecesToUci[savedata!.piece] &&  piecesToUci[savedata!.piece].toUpperCase()}`}  ${isKill}${ newLocation}`
+    const transFormToUCI = `${ isPeonUCI ?'' : `${piecesToUci[pieceSelecteToMove!.ficha] &&  piecesToUci[pieceSelecteToMove!.ficha].toUpperCase()}`}  ${isKill}${ newLocation}`
     const uciMove = transFormToUCI.replace(/ /g, "")
    
       const peonIsInGoal = (pieceSelecteToMove?.ficha === "peon" ) && ( Number(newLocation[1]) === 8 || Number(newLocation[1]) === 1)
@@ -125,6 +119,7 @@ export const makeAMove = ({
         setPeonInGolLocation('')
 
         try {
+          saveInHistory(uciMove)
           makeUserMove(uciMove)
 
           const newPicesSet = [

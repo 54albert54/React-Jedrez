@@ -7,7 +7,6 @@ import {
   cols,
   fichasPlayer1,
   fichasPlayer2,
-  HistoryMove,
   Piece,
 } from "./components/data";
 import { makeAMove } from "./components/moveFunct";
@@ -15,15 +14,15 @@ import Summary from "./components/UI/Summary";
 
 import useChessBoard from "./components/chessIA/index.ts";
 import ChangePeonWindow from "./components/UI/ChangePeonWindow.tsx";
+import UCIBoard from "./components/UI/UCIBoard.tsx";
+import useGameContext from "./context/index.tsx";
+import StartWindow from "./components/UI/StartWindow.tsx";
+import PlayerSide from "./components/UI/PlayerSide.tsx";
+import PaintBoard from "./components/UI/PaintBoard.tsx";
+import CoverBoard from "./components/UI/CoverBoard.tsx";
+import TheKingIsFallen from "./components/UI/TheKingIsFallen.tsx";
 
-// const aleatoryLocation = (): string => {
-//   const result =
-//     cols[Math.floor(Math.random() * cols.length)] +
-//     Math.floor(Math.random() * cols.length + 1);
 
-//   return result;
-// };
-// const allHearts = [aleatoryLocation(), aleatoryLocation(), aleatoryLocation()];
 const showPlayer = true;
 
 function App() {
@@ -37,21 +36,24 @@ function App() {
   const [showNextMove, setShowNextMove] = useState<string[]>([]);
   const [showNextMoveEnemy, setShowNextMoveEnemy] = useState<string[]>([]);
 
-  const [startGame, setStartGame] = useState(false);
+
 
   const [showAlert, setShowAlert] = useState(true);
   const [peonIsGoal, setPeonIsGoal] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [isFinshedGame, setIsFinshedGame] = useState(false);
 
-  const [playHistory, setPlayHistory] = useState<HistoryMove[]>([]);
+  
   const [isCheckMate, setIsCheckMate] = useState(false);
   const [playerVSPlayer, setPlayerVSPlayer] = useState(true);
-  const [lastPieceMovedIA, setLastPieceMovedIA] = useState("");
+ 
 
   const [peonInGolLocation, setPeonInGolLocation] = useState("");
 
-  const { allMove, makeUserMove, IAMakeMove, kingIsInHake } = useChessBoard();
+  const { allMove, makeUserMove, IAMakeMove, kingIsInHake ,showBoard } = useChessBoard();
+const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, setLastPieceMovedIA } = useGameContext()
+
+
 
   const resetAlert = () => {
     setShowAlert(false);
@@ -70,7 +72,7 @@ function App() {
     if (!playerVSPlayer && !isTurnOfPlayer && allMove.length > 0) {
       setShowAlert(true);
       const result = IAMakeMove();
-      console.log("result", result);
+      
 
       if (result.moveIsKill) {
         const piecePlayerToRemove = piecesPlayer1.filter(
@@ -85,8 +87,8 @@ function App() {
       );
       // setShowNextMoveEnemy([result])
 
-      console.log("enemmychoose", seletedEnemyPiece);
-      setLastPieceMovedIA(seletedEnemyPiece?.idPiece || "");
+      
+      setLastPieceMovedIA(seletedEnemyPiece!.idPiece );
       setPieceSelecteToMoveEnemy(seletedEnemyPiece);
 
       const ollEnemyPiece = piecesPlayer2.filter(
@@ -100,17 +102,17 @@ function App() {
       setPiecesPlayer2(updatedEnemyPieces as Piece[]);
       setIsTurnOfPlayer(true);
       setShowAlert(false);
+      saveInHistory(result.moveSaved)
     }
+
+
   }, [isTurnOfPlayer, piecesPlayer2]);
 
   const kingWasDeath = () => {
     setIsFinshedGame(true);
     setShowAlert(true);
   };
-  const saveInHistory = ({ newLocation, owner, piece }: HistoryMove) => {
-    const move = { newLocation, owner, piece };
-    setPlayHistory((prev) => [...prev, move]);
-  };
+ 
   useEffect(() => {
     if (kingIsInHake) {
       if (isTurnOfPlayer) {
@@ -129,8 +131,14 @@ function App() {
 
   return (
     <main>
-      {/* <UCIBoard {...{ showBoard }} /> */}
+      
+      
       <section className=" w-screen max-w-[514px] h-full   flex flex-col  mx-auto mt-20    relative  select-none ">
+        <div className="w-full flex justify-center h-5">
+      {
+        playHistory.length > 0 && <p>Last move { playHistory[playHistory.length - 1]}</p>
+    }
+    </div>
         <CoverBoard showAlert={showAlert}>
           {peonIsGoal && (
             <ChangePeonWindow
@@ -156,7 +164,9 @@ function App() {
                 setShowAlert,
                 playHistory,
               }}
-            />
+            >
+              <UCIBoard {...{ showBoard }} />
+              </Summary>
           )}
           {isFinshedGame && <TheKingIsFallen {...{ isCheckMate }} />}
           {isCheckMate && <TheKingIsFallen {...{ isCheckMate }} />}
@@ -167,24 +177,9 @@ function App() {
           )}
         </CoverBoard>
 
-        {/* <div className="flex flex-row ">
-          {cols.map((col) => (
-            <div
-              key={generateRandomString(8)}
-              className="col w-16   justify-center items-center"
-            >
-              <p className="text-center">{col}</p>
-            </div>
-          ))}
-        </div> */}
-        <section className="flex flex-col sm:flex-row border border-black ">
-          {/* <div className="flex flex-col ">
-            {cols.map((_, ind) => (
-              <div key={generateRandomString(8)} className="col h-16   justify-center items-center">
-                <p className="text-center py-6">{ind + 1}</p>
-              </div>
-            ))}
-          </div> */}
+       
+        <section className="flex flex- sm:flex-row border border-black ">
+          
 
           <div className="">
             {cols.map((_, indexRow) => (
@@ -406,168 +401,14 @@ function App() {
 
 export default App;
 
-const TheKingIsFallen = ({ isCheckMate }: { isCheckMate?: boolean }) => {
-  return (
-    <section
-      className="absolute z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 "
-      onClick={() => {
-        window.location.reload();
-      }}
-    >
-      <div className="flex justify-center my-4 ">
-        <p className=" text-center font-semibold text-xl ">
-          {isCheckMate ? "Hake Mate" : "Juego terminado"}
-        </p>
-      </div>
-    </section>
-  );
-};
 
-const CoverBoard = ({
-  showAlert,
-  children,
-}: {
-  showAlert: boolean;
-  children: React.ReactNode;
-}) => {
-  return (
-    <>
-      {showAlert && (
-        <section className="absolute z-50 w-full h-full bg-black/40  rounded-md shadow-2xl ">
-          {children}
-        </section>
-      )}
-    </>
-  );
-};
 
-const PaintBoard = ({
-  isBlack,
-  location,
-}: {
-  isBlack: boolean;
-  location: string;
-}) => {
-  return (
-    <div
-      key={generateRandomString(8)}
-      className={`${
-        isBlack ? "bg-white text-black/60" : "bg-black text-white/60"
-      } relative z-0 row w-[54px] h-[54px]   sm:w-16 sm:h-16   flex justify-center items-center  `}
-    >
-      {location}
-    </div>
-  );
-};
 
-const PlayerSide = ({
-  children,
-  showNextMove,
-  pieceSelecteToMove,
-  location,
-  isEnemy,
-  isTurnOfPlayer,
-  enemyPieces,
-  piecesPlayer,
-}: {
-  children: React.ReactNode;
-  showNextMove: string[];
-  pieceSelecteToMove: Piece | undefined;
-  location: string;
-  isEnemy: boolean;
-  isTurnOfPlayer: boolean;
-  enemyPieces: Piece[];
-  piecesPlayer: Piece[];
-}) => {
-  const isEnemyInSport = enemyPieces.find(
-    (piece) => piece.initialPlace === location
-  );
 
-  //
 
-  return (
-    <div
-      id={!isEnemy ? "white side" : "black side"}
-      className={` relative bottom-16 z-90  `}
-    >
-      {isTurnOfPlayer === !isEnemy &&
-        showNextMove.includes(location) &&
-        !piecesPlayer.map((piece) => piece.initialPlace).includes(location) &&
-        pieceSelecteToMove !== undefined && (
-          <div
-            className={`
-                
-                absolute top-[10px]   sm:top-0 w-[54px] h-[54px] sm:w-16 sm:h-16  z-20  ${
-                  isEnemy
-                    ? isEnemyInSport
-                      ? ""
-                      : "bg-red-500/30"
-                    : isEnemyInSport
-                    ? ""
-                    : "bg-green-500/30"
-                } `}
-          ></div>
-        )}
 
-      {children}
-    </div>
-  );
-};
 
-// UI
 
-const StartWindow = ({
-  setStartGame,
-  setShowAlert,
-  setPlayerVSPlayer,
-}: {
-  setStartGame: (state: boolean) => void;
-  setShowAlert:   (state: boolean) => void;
-  setPlayerVSPlayer: (state: boolean) => void;
-}) => {
-  return (
-    <section className="absolute z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 ">
-      <p className=" text-center font-semibold text-xl ">Elige Modo Juego</p>
 
-      <ul>
-        <li
-          onClick={() => {
-            setStartGame(true);
-            setShowAlert(false);
-            setPlayerVSPlayer(true);
-          }}
-          className="flex justify-center items-center cursor-pointer my-4  bg-white w-32 mx-auto rounded-full border   border-emerald-500 px-2.5 py-0.5 text-emerald-700 active:bg-emerald-400 active:text-teal-50 hover:bg-emerald-300 shadow-md"
-        >
-          <p>PVE</p>
-        </li>
 
-        <li
-          onClick={() => {
-            setStartGame(true);
-            setShowAlert(false);
-            setPlayerVSPlayer(false);
-          }}
-          className="flex justify-center items-center cursor-pointer my-4  bg-white w-32 mx-auto rounded-full border   border-emerald-500 px-2.5 py-0.5 text-emerald-700 active:bg-emerald-400 active:text-teal-50 hover:bg-emerald-300 shadow-md"
-        >
-          <p>PVC</p>
-        </li>
 
-        <li>
-          <div className="flex items-center justify-center flex-col ">
-            <p>Dificultad</p>
-            <div>
-              {[1, 2, 3].map((dificulty) => (
-                <button
-                  key={dificulty}
-                  className="w-10 mt-2 mx-4 bg-white rounded-full border   border-blue-500 px-2.5 py-0.5 text-blue-700 active:bg-blue-400 active:text-teal-50 hover:bg-blue-300 shadow-md"
-                >
-                  {dificulty}
-                </button>
-              ))}
-            </div>
-          </div>
-        </li>
-      </ul>
-    </section>
-  );
-};

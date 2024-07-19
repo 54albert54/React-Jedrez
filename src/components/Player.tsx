@@ -58,6 +58,8 @@ useEffect(()=>{
 },[piecesPlayer])
 
 
+
+
   if (type.ficha === "peon") {
     movePiecePeon({
       type,
@@ -122,24 +124,25 @@ useEffect(()=>{
     
       <div
         className={`relative top-[10px]  sm:top-0  flex flex-col justify-center items-center 
-          ${
-            lastPieceMovedIA === type.idPiece
-              ? "border-red-500"
-              : ""
-          }
-
+         
           ${isTurnOfPlayer === !type.isEnemy && !(isTurnOfPlayer === !type.isEnemy &&
-            pieceSelecteToMove?.idPiece === type.idPiece) ? " border-yellow-500" : " border-transparent"}
+            pieceSelecteToMove?.idPiece === type.idPiece) ? " border-yellow-500 border-[4px] " : " "}
           ${
             isTurnOfPlayer === !type.isEnemy &&
             pieceSelecteToMove?.idPiece === type.idPiece
               ? "bg-yellow-600"
               : ""
           }
+           ${
+            lastPieceMovedIA === type.idPiece
+              ? "border-red-500 border-[4px] "
+              : ""
+          }
+
           ${isEnemyInSport   && dataCamaradeOnly.includes(type.initialPlace) ? "bg-red-600" : ""}
           ${
             type.isEnemy ? " " : " "
-          } z-90  w-[54px] h-[54px]   sm:w-16 sm:h-16   border-[4px]      hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
+          } z-90  w-[54px] h-[54px]   sm:w-16 sm:h-16        hover:cursor-pointer flex justify-center items-center  font-normal text-sm  text-white `}
         onClick={() => {
           setShowNextMove(youCanMove);
 

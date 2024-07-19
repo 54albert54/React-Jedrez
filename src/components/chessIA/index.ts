@@ -46,6 +46,7 @@ const useChessBoard = () => {
 
   const IAMakeMove = () => {
     let moveIsKill = false;
+    let moveSaved: string;
 
     const moves = controlBoard.moves();
     const move = moves[Math.floor(Math.random() * moves.length)];
@@ -53,21 +54,24 @@ const useChessBoard = () => {
     const moveCanBeKill = moves.find((m) => m[1] === "x");
 
     if (moveCanBeKill) {
+      moveSaved = moveCanBeKill;
       controlBoard.move(moveCanBeKill);
 
       moveIsKill = true;
+
     } else {
+      moveSaved = move;
       controlBoard.move(move);
     }
 
     refrechshowBoard();
     const history = controlBoard.history({ verbose: true });
-    console.log("the last move in inventary", history[history.length - 1]);
 
     return {
       from: history[history.length - 1].from,
       to: history[history.length - 1].to,
       moveIsKill,
+      moveSaved
     };
   };
 
@@ -83,6 +87,7 @@ const useChessBoard = () => {
     IAMakeMove,
     searcByPiece,
     kingIsInHake,
+    
   };
 };
 
