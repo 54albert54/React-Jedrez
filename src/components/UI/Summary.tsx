@@ -3,9 +3,7 @@ import { useRef, useEffect } from "react";
 import { Piece } from "../data";
 
 const Summary = ({
-  isTurnOfPlayer,
-  piecesPlayer1,
-  piecesPlayer2,
+
   setShowSummary,
   setShowAlert,
   children,
