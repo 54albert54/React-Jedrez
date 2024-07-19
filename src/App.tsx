@@ -12,7 +12,7 @@ import {
 import { makeAMove } from "./components/moveFunct";
 import Summary from "./components/UI/Summary";
 
-import useChessBoard from "./components/chessIA/index.ts";
+
 import ChangePeonWindow from "./components/UI/ChangePeonWindow.tsx";
 import UCIBoard from "./components/UI/UCIBoard.tsx";
 import useGameContext from "./context/index.tsx";
@@ -50,8 +50,8 @@ function App() {
 
   const [peonInGolLocation, setPeonInGolLocation] = useState("");
 
-  const { allMove, makeUserMove, IAMakeMove, kingIsInHake ,showBoard } = useChessBoard();
-const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, setLastPieceMovedIA } = useGameContext()
+
+const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, setLastPieceMovedIA , allmoves, makeUserMove, IAMakeMove, kingIsInHake ,showBoard } = useGameContext()
 
 
 
@@ -62,14 +62,14 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
   };
 
   useEffect(() => {
-    if (allMove.length == 0) {
+    if (allmoves.length == 0) {
       setIsCheckMate(true);
       setShowAlert(true);
     }
   }, [piecesPlayer1, piecesPlayer2]);
 
   useEffect(() => {
-    if (!playerVSPlayer && !isTurnOfPlayer && allMove.length > 0) {
+    if (!playerVSPlayer && !isTurnOfPlayer && allmoves.length > 0) {
       setShowAlert(true);
       const result = IAMakeMove();
       
@@ -88,7 +88,7 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
       // setShowNextMoveEnemy([result])
 
       
-      setLastPieceMovedIA(seletedEnemyPiece!.idPiece );
+      setLastPieceMovedIA(seletedEnemyPiece?.idPiece || "");
       setPieceSelecteToMoveEnemy(seletedEnemyPiece);
 
       const ollEnemyPiece = piecesPlayer2.filter(
@@ -138,7 +138,9 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
       {
         playHistory.length > 0 && <p>Last move { playHistory[playHistory.length - 1]}</p>
     }
+    
     </div>
+    
         <CoverBoard showAlert={showAlert}>
           {peonIsGoal && (
             <ChangePeonWindow
@@ -239,6 +241,7 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
                             setShowAlert,
                             setPeonIsGoal,
                             setPeonInGolLocation,
+                            allmoves
                           });
                         !playerVSPlayer &&
                           isTurnOfPlayer &&
@@ -263,6 +266,7 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
                             setShowAlert,
                             setPeonIsGoal,
                             setPeonInGolLocation,
+                            allmoves
                           });
                       }}
                       className={` relative w-[54px] h-[54px]   sm:w-16 sm:h-16  `}
@@ -379,6 +383,13 @@ const {startGame, setStartGame , playHistory,saveInHistory ,lastPieceMovedIA, se
           </div>
         </section>
       </section>
+      {/* <div className="flex-wrap px-20 sm:px-40 mt-10 bg-blue-700 flex justify-center gap-3 w-full">
+        {
+          allmoves.map((move, index) => {
+            return <p key={index}>{move}</p>
+          })
+        }
+      </div> */}
       <div className="flex justify-center mt-9 ">
         <button
           className={`  ${

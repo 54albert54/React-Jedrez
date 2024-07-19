@@ -1,4 +1,4 @@
-import { piecesToUci } from "./chessIA";
+import {  piecesToUci } from "./chessIA";
 import {  Piece } from "./data";
 import { Dispatch, SetStateAction } from 'react';
 
@@ -19,7 +19,7 @@ export const makeAMove = ({
   saveInHistory,
   kingWasDeath,
   makeUserMove,
- 
+  allmoves,
   setShowAlert,
   setPeonIsGoal,
   setPeonInGolLocation
@@ -43,6 +43,7 @@ export const makeAMove = ({
   setShowAlert:(showAlert:boolean)=>void
   setPeonIsGoal:(setPeonIsGoal:boolean)=>void
   setPeonInGolLocation:(setPeonInGolLocation:string)=>void
+  allmoves:string[]
 }) => {
   const isSameLocation = pieceSelecteToMove?.initialPlace === newLocation
   const oldPieces = piecesPlayer.filter(
@@ -94,41 +95,14 @@ export const makeAMove = ({
     const uciMove = transFormToUCI.replace(/ /g, "")
    
       const peonIsInGoal = (pieceSelecteToMove?.ficha === "peon" ) && ( Number(newLocation[1]) === 8 || Number(newLocation[1]) === 1)
-
+ 
+      
       if (peonIsInGoal) 
-      {
-        setShowAlert(true)
-        setPeonIsGoal(true)
-        isEnemyInNextLocation  ? setPeonInGolLocation("x"+newLocation): setPeonInGolLocation(newLocation)
-
-        if (isEnemyInNextLocation){
-          const newEnemyPieces = enemyPieces.filter(
-            (piece) => piece.initialPlace !== isEnemyInNextLocation.initialPlace
-          );
-          // delete a enemy piece at new location
-          if (!newEnemyPieces.map(piece => piece.ficha).includes("rey")){
-     
-            kingWasDeath()
-          }
-          
-          setEnemyPieces(newEnemyPieces)
-          
-        }
-        
-      }else{
-        setPeonInGolLocation('')
-
-        try {
-          saveInHistory(uciMove)
-          makeUserMove(uciMove)
-
-          const newPicesSet = [
-            ...oldPieces,
-            {
-              ...pieceSelecteToMove,
-              initialPlace: newLocation,
-            },
-          ];
+        {
+          setShowAlert(true)
+          setPeonIsGoal(true)
+          isEnemyInNextLocation  ? setPeonInGolLocation("x"+newLocation): setPeonInGolLocation(newLocation)
+  
           if (isEnemyInNextLocation){
             const newEnemyPieces = enemyPieces.filter(
               (piece) => piece.initialPlace !== isEnemyInNextLocation.initialPlace
@@ -142,23 +116,60 @@ export const makeAMove = ({
             setEnemyPieces(newEnemyPieces)
             
           }
-        
-          !peonIsInGoal && 
-          setIsTurnOfPlayer((state: boolean) => !state) 
-         
-          setPiecesPlayer(newPicesSet as Piece[]);
           
-         !peonIsInGoal &&
-           setPieceSelecteToMove(undefined);
-          setShowNextMove([]);
-          setClearNextMoveEnemy([]);
+        }else{
+          setPeonInGolLocation('')
+          
+          
+  
+          try {
+
+            if (allmoves.includes(uciMove) || allmoves.includes(uciMove + "#") || allmoves.includes(uciMove + "+")) {
+              
+              
+           
+            saveInHistory(uciMove)
+            makeUserMove(uciMove)
+  
+            const newPicesSet = [
+              ...oldPieces,
+              {
+                ...pieceSelecteToMove,
+                initialPlace: newLocation,
+              },
+            ];
+            if (isEnemyInNextLocation){
+              const newEnemyPieces = enemyPieces.filter(
+                (piece) => piece.initialPlace !== isEnemyInNextLocation.initialPlace
+              );
+              // delete a enemy piece at new location
+              if (!newEnemyPieces.map(piece => piece.ficha).includes("rey")){
          
-        } catch (error) {
-          console.log('error',error);
+                kingWasDeath()
+              }
+              
+              setEnemyPieces(newEnemyPieces)
+              
+            }
+          
+            !peonIsInGoal && 
+            setIsTurnOfPlayer((state: boolean) => !state) 
+           
+            setPiecesPlayer(newPicesSet as Piece[]);
+            
+           !peonIsInGoal &&
+             setPieceSelecteToMove(undefined);
+            setShowNextMove([]);
+            setClearNextMoveEnemy([]);
+          }
+           
+          } catch (error) {
+            console.log('error',error);
+            
+          }
           
         }
-        
-      }
+    
       
      
 
