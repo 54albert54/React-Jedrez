@@ -1,7 +1,7 @@
 import { Chess, PieceSymbol } from "chess.js";
 import { useState } from "react";
 
-export const piecesToUci = {
+export const piecesToUci: Record< string , PieceSymbol> = {
   peon: "p",
   torre: "r",
   caballo: "n",

@@ -1,6 +1,6 @@
 
 export const cols = ["a", "b", "c", "d", "e", "f", "g", "h"];
- //"peon" | "caballo" | "alfil" | "rey" | "reina" | "torre";
+export type PieceName = "peon" | "caballo" | "alfil" | "rey" | "reina" | "torre";
 export interface HistoryMove {
   owner:'blancas' | 'negras'
   piece:string

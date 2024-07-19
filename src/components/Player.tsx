@@ -20,13 +20,14 @@ const Player = ({
 }: {
   piecesPlayer: Piece[];
   type: Piece;
-  setShowNextMove: any;
+  setShowNextMove: (showNextMove: string[]) => void;
   pieceSelecteToMove: Piece | undefined;
-  setPieceSelecteToMove: any;
+  setPieceSelecteToMove: (pieceSelecteToMove: Piece | undefined) => void;
   enemyPieces: Piece[];
   showNextMove: string[];
   isTurnOfPlayer: boolean;
   lastPieceMovedIA?: string
+ 
   
 }) => {
   const ocupedSpot = [

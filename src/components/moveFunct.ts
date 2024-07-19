@@ -1,5 +1,7 @@
 import { piecesToUci } from "./chessIA";
 import { HistoryMove, Piece } from "./data";
+import { Dispatch, SetStateAction } from 'react';
+
 
 export const makeAMove = ({
   newLocation,
@@ -26,21 +28,21 @@ export const makeAMove = ({
   showNextMove: string[];
   pieceSelecteToMove: Piece | undefined;
   piecesPlayer: Piece[];
-  setPiecesPlayer: any;
-  setPieceSelecteToMove: any;
-  setShowNextMove: any;
-  setIsTurnOfPlayer: any;
+  setPiecesPlayer: (piecesPlayer: Piece[]) => void;
+  setPieceSelecteToMove: (pieceSelecteToMove: Piece | undefined) => void;
+  setShowNextMove: (showNextMove: string[]) => void;
+  setIsTurnOfPlayer: Dispatch<SetStateAction<boolean>>;
   enemyPieces: Piece[];
-  setEnemyPieces: any;
-  setPieceSelecteToMoveEnemy: any
-  setClearNextMoveEnemy: any
+  setEnemyPieces: (piecesPlayer: Piece[]) => void;
+  setPieceSelecteToMoveEnemy: (pieceSelecteToMove: Piece | undefined) => void;
+  setClearNextMoveEnemy: React.Dispatch<React.SetStateAction<string[]>>;
   saveInHistory:({newLocation,owner , piece }:HistoryMove)=>void
   kingWasDeath:()=>void
   makeUserMove:(uci:string)=>void
   playerVSPlayer:boolean
-  setShowAlert:any
-  setPeonIsGoal:any
-  setPeonInGolLocation:any
+  setShowAlert:(showAlert:boolean)=>void
+  setPeonIsGoal:(setPeonIsGoal:boolean)=>void
+  setPeonInGolLocation:(setPeonInGolLocation:string)=>void
 }) => {
   const isSameLocation = pieceSelecteToMove?.initialPlace === newLocation
   const oldPieces = piecesPlayer.filter(
@@ -92,8 +94,9 @@ export const makeAMove = ({
       saveInHistory({...savedata ,newLocation:"kill a " + isEnemyInNextLocation.ficha })
      
     }
+    // const nameIsValid:PieceName = piecesToUci[savedata!.piece] as PieceName
 
-    const transFormToUCI = `${ isPeonUCI ?'' :savedata.owner == "blancas" ? `${piecesToUci[savedata!.piece].toUpperCase()}` : `${piecesToUci[savedata.piece ].toUpperCase() }`}  ${isKill}${ newLocation}`
+    const transFormToUCI = `${ isPeonUCI ?'' : `${piecesToUci[savedata!.piece] &&  piecesToUci[savedata!.piece].toUpperCase()}`}  ${isKill}${ newLocation}`
     const uciMove = transFormToUCI.replace(/ /g, "")
    
       const peonIsInGoal = (pieceSelecteToMove?.ficha === "peon" ) && ( Number(newLocation[1]) === 8 || Number(newLocation[1]) === 1)
@@ -129,7 +132,6 @@ export const makeAMove = ({
             {
               ...pieceSelecteToMove,
               initialPlace: newLocation,
-              isSelected: false,
             },
           ];
           if (isEnemyInNextLocation){
@@ -149,7 +151,7 @@ export const makeAMove = ({
           !peonIsInGoal && 
           setIsTurnOfPlayer((state: boolean) => !state) 
          
-          setPiecesPlayer(newPicesSet);
+          setPiecesPlayer(newPicesSet as Piece[]);
           
          !peonIsInGoal &&
            setPieceSelecteToMove(undefined);

@@ -18,7 +18,7 @@ const Summary = ({
   playHistory: HistoryMove[]
 }) => {
 
-  const scrollContainerRef = useRef(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
