@@ -33,14 +33,22 @@ const Summary = ({
       onClick={() => {
         setShowSummary(false), setShowAlert(false);
       }}
-      className="absolute  z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 "
+      className="absolute flex  z-50 w-[350px] h-[350px] px-6 bg-slate-200 shadow-inner translate-y-1/4 left-1/2 -translate-x-1/2 rounded-md  pt-4 "
     >
-      <div className="w-full h-[70%] flex flex-row px-3">
+      <div className="w-full h-[70%] flex flex-col justify-between px-3">
+      <p className="text-center font-semibold text-xl mt-2">UCI Board</p>
         {children}
-        <div
+
+
+       
+      </div>
+      <div className=" w-full relative bg-slate-200  py-1 rounded-b-md ">
+      <p className=" text-center font-semibold text-xl ">historial</p>
+      <div
           ref={scrollContainerRef}
-          className="  w-full h-[80%]  p-2 overflow-scroll  "
+          className="  w-full h-[80%]  p-2 overflow-scroll border-black border-2 rounded-lg bg-gray-50 "
         >
+         
           {
              playHistory.map((move, index) => {
               return (
@@ -57,41 +65,7 @@ const Summary = ({
             })
           }
         </div>
-      </div>
-      <div className=" w-full relative bg-slate-200  py-1 rounded-b-md ">
-        <div className="flex justify-around h-full px-6  text-sm">
-          <p
-            className={`
-     ${
-       isTurnOfPlayer
-         ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-8 "
-         : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-8 "
-     } 
-     inline-flex items-center justify-center rounded-full my-auto  px-2.5 py-0.5 border  transition-all duration-200 ease-in-out
-     `}
-          >
-            Blancas: {piecesPlayer1.length}
-          </p>
-          <p className="flex h-full justify-center items-center  my-auto w-4">
-            {isTurnOfPlayer ? "<" : ">"}
-          </p>
-          <p
-            className={`
-    ${
-      !isTurnOfPlayer
-        ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-8"
-        : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-8 "
-    } "}
-    inline-flex items-center justify-center rounded-full   my-auto border  transition-all duration-200 ease-in-out
-    `}
-          >
-            Negras: {piecesPlayer2.length}
-          </p>
-        </div>
-
-        <div className="flex justify-center my-4 ">
-         
-        </div>
+       
       </div>
     </section>
   );

@@ -3,7 +3,8 @@ import { generateRandomString } from "../const";
 const UCIBoard =({showBoard}:{showBoard:string[]})=>{
 
   return(
-    <div>
+    <div className="bg-gray-50 my-auto border-black border-2 overflow-hidden rounded-lg">
+      
     {showBoard.map((line, index) => {
       const DataSquare = [];
 

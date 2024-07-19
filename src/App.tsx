@@ -210,6 +210,47 @@ function App() {
               {...{ setStartGame, setShowAlert, setPlayerVSPlayer }}
             />
           )}
+          {showAllMoves && (
+        <div className="flex-wrap px-20 sm:px-40 mt-4 flex justify-center gap-3 border-slate-950 w-full text-center text-[12px]">
+          
+          
+         <div className="flex-wrap text-ellipsis min-h-[150px]  flex justify-center gap-3 border-slate-950 py-2 px-6  bg-red-100 rounded-lg  text-sm shadow-sm border-2">
+          {allmoves.map((move, index) => {
+            return <p key={index}>{move}</p>;
+          })}
+          </div>
+
+         
+          <div className="w-full flex flex-col justify-center gap-3">
+          <div 
+          onClick={() => {setShowReumen(!showReumen) ,setShowMoreInfo(false)}}
+          className="bg-gray-300 rounded-lg shadow-sm border-dotted border-2 flex flex-col py-4 transition-all">
+            {showReumen ? (
+              <>
+              {showAllPices(piecesPlayer2, "Black")}
+            {showAllPices(piecesPlayer1, "White")}
+            </>
+            ):(<p> Resumen </p>)}
+          </div>
+          <div 
+          onClick={() => {setShowMoreInfo(!showMoreInfo) ,setShowReumen(false)}}
+          className="bg-blue-300 rounded-lg shadow-sm border-dotted border-2 py-4 transition-all ">
+            {
+              showMoreInfo ? (
+                <div className="pl-3 text-left">
+                <p className="">N: caballo R: torre B: alfil Q: reina R: rey</p>
+                <p>si termina en '+' es hake</p>
+                <p>si termina en '#' es mate</p>
+                <p>posicion inicial 'x' pocion final es comer una piesa </p>
+                <p>h8=Q peon por reina etc</p>
+                </div>
+                ):( <p> Reglas </p>)
+            }
+          </div>
+          </div>
+
+        </div>
+      )}
         </CoverBoard>
 
         <section className="flex flex- sm:flex-row border border-black ">
@@ -407,51 +448,11 @@ function App() {
           </div>
         </section>
       </section>
-      {showAllMoves && (
-        <div className="flex-wrap px-20 sm:px-40 mt-4 flex justify-center gap-3 border-slate-950 w-full text-center text-[12px]">
-          
-          
-         <div className="flex-wrap overflow-scroll text-ellipsis h-[150px]  flex justify-center gap-3 border-slate-950 p-6  bg-red-100 rounded-lg font-semibold text-sm shadow-sm border-2">
-          {allmoves.map((move, index) => {
-            return <p key={index}>{move}</p>;
-          })}
-          </div>
-
-         
-          <div className="w-full flex flex-col justify-center gap-3">
-          <div 
-          onClick={() => setShowReumen(!showReumen)}
-          className="bg-gray-300 rounded-lg shadow-sm border-dotted border-2 flex flex-col py-4 transition-all">
-            {showReumen ? (
-              <>
-              {showAllPices(piecesPlayer2, "Black")}
-            {showAllPices(piecesPlayer1, "White")}
-            </>
-            ):(<p> Resumen </p>)}
-          </div>
-          <div 
-          onClick={() => setShowMoreInfo(!showMoreInfo)}
-          className="bg-blue-300 rounded-lg shadow-sm border-dotted border-2 py-4 transition-all ">
-            {
-              showMoreInfo ? (
-                <div className="pl-3 text-left">
-                <p className="">N: caballo R: torre B: alfil Q: reina R: rey</p>
-                <p>si termina en '+' es hake</p>
-                <p>si termina en '#' es mate</p>
-                <p>posicion inicial 'x' pocion final es comer una piesa </p>
-                <p>h8=Q peon por reina etc</p>
-                </div>
-                ):( <p> Reglas </p>)
-            }
-          </div>
-          </div>
-
-        </div>
-      )}
+      
       <div className="flex justify-center mt-9 ">
         <button
           className="bg-blue-500  mr-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => setShowAllMoves((state) => (state ? false : true))}
+          onClick={() => {setShowAllMoves((state) => (state ? false : true)) , setShowAlert((state) => (state ? false : true))}}
         >
           Movimientos
         </button>
