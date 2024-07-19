@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./App.css";
 import Player from "./components/Player";
@@ -7,10 +7,22 @@ import {
   cols,
   fichasPlayer1,
   fichasPlayer2,
-  peonCanChangeTo,
+  HistoryMove,
   Piece,
 } from "./components/data";
 import { makeAMove } from "./components/moveFunct";
+import Summary from "./components/UI/Summary";
+import UCIBoard from "./components/UI/UCIBoard.tsx";
+import useChessBoard from "./components/chessIA/index.ts";
+import ChangePeonWindow from "./components/UI/ChangePeonWindow.tsx";
+
+
+
+
+
+
+
+
 
 // const aleatoryLocation = (): string => {
 //   const result =
@@ -22,38 +34,10 @@ import { makeAMove } from "./components/moveFunct";
 // const allHearts = [aleatoryLocation(), aleatoryLocation(), aleatoryLocation()];
 const showPlayer = true;
 
-const changePeonInGoal = ({
-  pieces,
-  change,
-  alertArea,
-  ownAlert,
-  savePices,
-  setChangeTurn
-}: {
-  pieces: Piece[];
-  alertArea: any;
-  ownAlert: any;
-change:string
-savePices: any
-setChangeTurn: any
-}) => {
 
- 
 
-  const peonId = pieces.find((piece) => (piece.ficha === 'peon'&& piece.initialPlace[1] === '8' )|| (piece.ficha === 'peon' && piece.initialPlace[1] === '1'));
-  const oldPieces = pieces.filter((piece) => piece.initialPlace !== peonId?.initialPlace);
-  console.log('oldPieces',peonId);
-  
-  const changePeon = [...oldPieces, { ...peonId, ficha: change }];
-   console.log('changePeon',changePeon);
-  
-   savePices(changePeon);
-setTimeout(() => {
-  alertArea(false);
-  ownAlert(false);
-},500)
-  // setChangeTurn(state => !state);
-};
+
+
 
 function App() {
   const [piecesPlayer1, setPiecesPlayer1] = useState<Piece[]>(fichasPlayer1);
@@ -61,51 +45,156 @@ function App() {
   const [pieceSelecteToMove, setPieceSelecteToMove] = useState<Piece>();
   const [pieceSelecteToMoveEnemy, setPieceSelecteToMoveEnemy] =
     useState<Piece>();
-  const [isTurnOfPlayer, setIsTurnOfPlayer] = useState(true);
+  const [isTurnOfPlayer,  setIsTurnOfPlayer   ] = useState(true);
 
-  const [showNextMove, setShowNextMove] = useState([]);
-  const [showNextMoveEnemy, setShowNextMoveEnemy] = useState([]);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showNextMove, setShowNextMove] = useState<string[]>([]);
+  const [showNextMoveEnemy, setShowNextMoveEnemy] = useState<string[]>([]);
+
+  const [startGame, setStartGame] = useState(false);
+
+
+
+  const [showAlert, setShowAlert] = useState(true);
   const [peonIsGoal, setPeonIsGoal] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [isFinshedGame, setIsFinshedGame] = useState(false);
+
+  const [playHistory, setPlayHistory] = useState<HistoryMove[]>([]);
+  const [isCheckMate, setIsCheckMate] = useState(false);
+  const [playerVSPlayer, setPlayerVSPlayer] = useState(true);
+  const [lastPieceMovedIA, setLastPieceMovedIA] = useState('');
+
+  const [peonInGolLocation, setPeonInGolLocation] = useState('');
+
+  const  {
+    allMove,
+    showBoard, 
+    makeUserMove,
+    IAMakeMove,
+    kingIsInHake,
+    } = useChessBoard()
+
+
+    const resetAlert = () => {
+      setShowAlert(false)
+      setPeonIsGoal(false)
+      setIsTurnOfPlayer(state => !state)
+    }
+
+    useEffect(() => {
+      if (allMove.length == 0){
+        setIsCheckMate(true)
+        setShowAlert(true)
+        }
+
+
+    }, [piecesPlayer1 ,piecesPlayer2])
+    
+    useEffect(() => {
+      
+      
+      if ((!playerVSPlayer && !isTurnOfPlayer) && allMove.length > 0) {
+        setShowAlert(true);
+        const result = IAMakeMove()
+        console.log('result',result);
+        
+      
+  
+
+        if (result.moveIsKill){
+          const piecePlayerToRemove = piecesPlayer1.filter(piece => piece.initialPlace !== result.to)
+          
+          
+          setPiecesPlayer1(piecePlayerToRemove)
+
+        }
+          
+          
+         const  seletedEnemyPiece : Piece | undefined = piecesPlayer2.find(piece => piece.initialPlace === result.from)
+          // setShowNextMoveEnemy([result])
+        
+
+
+       
+
+        console.log('enemmychoose',seletedEnemyPiece);
+        setLastPieceMovedIA(seletedEnemyPiece?.idPiece || '')
+        setPieceSelecteToMoveEnemy(seletedEnemyPiece)
+          
+      const ollEnemyPiece = piecesPlayer2.filter(piece => piece.idPiece !== seletedEnemyPiece?.idPiece )
+
+      const updatedEnemyPieces = [...ollEnemyPiece,{... seletedEnemyPiece,initialPlace:result.to}]
+      setPiecesPlayer2(updatedEnemyPieces as Piece[])
+      setIsTurnOfPlayer(true);   
+      setShowAlert(false);  
+  
+        
+    }
+    
+    }, [isTurnOfPlayer, piecesPlayer2])
+
+  const kingWasDeath = () => {
+    setIsFinshedGame(true);
+    setShowAlert(true);
+  };
+  const saveInHistory = ({ newLocation, owner, piece }: HistoryMove) => {
+    const move = { newLocation, owner, piece };
+    setPlayHistory((prev) => [...prev, move]);
+  };
+  useEffect(() => {
+    if(kingIsInHake){
+      
+      if (isTurnOfPlayer) {
+        const searchToKing = piecesPlayer1.find(piece => piece.ficha === 'rey')
+        setPieceSelecteToMove(searchToKing);
+      }else{
+        const searchToKing = piecesPlayer2.find(piece => piece.ficha === 'rey')
+        setPieceSelecteToMoveEnemy(searchToKing);
+      }
+    }
+   
+
+  }, [kingIsInHake]);
 
   return (
     <main>
-      <section className=" w-screen max-w-[800px] h-full   flex flex-col  mx-auto mt-20   relative  select-none ">
-        {showAlert && (
-          <section className="absolute z-50 w-full h-full bg-black/40  rounded-md shadow-2xl ">
-            {peonIsGoal && (
-              <section className="absolute z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 ">
-                <p className=" text-center font-semibold text-xl ">
-                  Elige una Pieza
-                </p>
-                <ul className=" ">
-                  {peonCanChangeTo.map((piece) => (
-                    <li
-                      key={generateRandomString(8)}
-                      onClick={() =>
-                        changePeonInGoal({
-                          pieces: !isTurnOfPlayer
-                          ? piecesPlayer1
-                          : piecesPlayer2,
-                          change: piece,
-                          alertArea: setShowAlert,
-                          ownAlert: setPeonIsGoal,
-                          savePices:!isTurnOfPlayer
-                          ? setPiecesPlayer1
-                          : setPiecesPlayer2,
-                          setChangeTurn: setIsTurnOfPlayer
-                        })
-                      }
-                      className="flex justify-center items-center cursor-pointer my-4  bg-white w-32 mx-auto rounded-full border   border-emerald-500 px-2.5 py-0.5 text-emerald-700 active:bg-emerald-400 active:text-teal-50 hover:bg-emerald-300 shadow-md"
-                    >
-                      {piece}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-          </section>
-        )}
+      {
+        kingIsInHake && <p className=" text-center font-semibold text-4xl ">Juego terminado</p>
+      }
+      <UCIBoard {...{ showBoard }} />
+      <section className=" w-screen max-w-[514px] h-full   flex flex-col  mx-auto mt-20    relative  select-none ">
+        <CoverBoard showAlert={showAlert}>
+          {peonIsGoal && (
+            <ChangePeonWindow
+              {...{
+                piece:isTurnOfPlayer?  pieceSelecteToMove  :  pieceSelecteToMoveEnemy,
+                resetAlert,
+                savePices: isTurnOfPlayer
+                  ? setPiecesPlayer1
+                  : setPiecesPlayer2,
+                setChangeTurn: setIsTurnOfPlayer,
+                makeUserMove,
+                peonInGolLocation
+              }}
+            />
+          )}
+          {showSummary && (
+            <Summary
+              {...{
+                isTurnOfPlayer,
+                piecesPlayer1,
+                piecesPlayer2,
+                setShowSummary,
+                setShowAlert,
+                playHistory,
+              }}
+            />
+          )}
+          {isFinshedGame && <TheKingIsFallen {... {isCheckMate}} />}
+          {isCheckMate &&  <TheKingIsFallen {... {isCheckMate}} />}
+          {!startGame && <StartWindow {...{ setStartGame, setShowAlert ,setPlayerVSPlayer }} />}
+        </CoverBoard>
+
         {/* <div className="flex flex-row ">
           {cols.map((col) => (
             <div
@@ -127,9 +216,9 @@ function App() {
 
           <div className="">
             {cols.map((_, indexRow) => (
-              <div key={generateRandomString(8)} className="row ">
-                <div className="col flex ">
-                  <div className="flex">
+              <div key={generateRandomString(8)} id={`row${8 - indexRow }`} className="row flex">
+               
+                  
                     {cols.map((row, index) => {
                       const isBlack =
                         indexRow % 2 === 0 ? index % 2 === 0 : index % 2 !== 0;
@@ -137,9 +226,10 @@ function App() {
 
                       return (
                         <div
+                        id={location}
                           key={generateRandomString(8)}
                           onMouseDown={() => {
-                            makeAMove({
+                           ( playerVSPlayer ) &&  makeAMove({
                               newLocation: location,
                               showNextMove: isTurnOfPlayer
                                 ? showNextMove
@@ -172,7 +262,37 @@ function App() {
                               setClearNextMoveEnemy: isTurnOfPlayer
                                 ? setShowNextMoveEnemy
                                 : setShowNextMove,
+                              saveInHistory,
+                              kingWasDeath,
+                              makeUserMove,
+                              playerVSPlayer,
+                              setShowAlert,
+                              setPeonIsGoal ,
+                              setPeonInGolLocation
+
                             });
+                            ( !playerVSPlayer &&  isTurnOfPlayer ) &&    makeAMove({
+                              newLocation: location,
+                              showNextMove: showNextMove,
+                              pieceSelecteToMove: pieceSelecteToMove,
+                              piecesPlayer: piecesPlayer1,
+                              setPiecesPlayer: setPiecesPlayer1,
+                              setPieceSelecteToMove: setPieceSelecteToMove,
+                              setPieceSelecteToMoveEnemy: setPieceSelecteToMoveEnemy,
+                              setShowNextMove: setShowNextMove,
+                              setIsTurnOfPlayer: setIsTurnOfPlayer,
+                              enemyPieces: piecesPlayer2,
+                              setEnemyPieces: setPiecesPlayer2,
+                              setClearNextMoveEnemy: setShowNextMoveEnemy,
+                              saveInHistory: saveInHistory,
+                              kingWasDeath: kingWasDeath,
+                              makeUserMove: makeUserMove,
+                              playerVSPlayer: playerVSPlayer,
+                              setShowAlert,
+                              setPeonIsGoal ,
+                              setPeonInGolLocation
+                            }); 
+
                           }}
                           className={` relative w-[54px] h-[54px]   sm:w-16 sm:h-16  `}
                         >
@@ -192,6 +312,7 @@ function App() {
                             >
                               {piecesPlayer1.map((piece) => {
                                 piece.isEnemy = false;
+                                if (piece.initialPlace !== location) return null;
                                 return (
                                   <div key={generateRandomString(8)}>
                                     {piece.initialPlace === location && (
@@ -236,11 +357,13 @@ function App() {
                             isEnemy={true}
                             isTurnOfPlayer={isTurnOfPlayer}
                             piecesPlayer={piecesPlayer2}
+                            
                           >
                             {piecesPlayer2.map((piece) => {
                               piece.isEnemy = true;
+                              if (piece.initialPlace !== location) return null;
                               return (
-                                <div key={generateRandomString(8)}>
+                                <div id={piece.ficha +"-"+ (piece.isEnemy ? "black" : "white")} key={generateRandomString(8)}>
                                   {piece.initialPlace === location && (
                                     <Player
                                       type={piece}
@@ -266,6 +389,7 @@ function App() {
                                       }
                                       setShowAlert={setShowAlert}
                                       setPeonIsGoal={setPeonIsGoal}
+                                      lastPieceMovedIA={lastPieceMovedIA}
                                     />
                                   )}
                                 </div>
@@ -275,59 +399,67 @@ function App() {
                         </div>
                       );
                     })}
-                  </div>
-                </div>
+                  
+                
               </div>
             ))}
           </div>
-
-          <section id="UI" className="w-full h-full bg-red-400 ">
-            <div id="turn" className="bg-blue-l200  w-full h-5/6">
-              d
-            </div>
-            <div className="bg-blue-100 w-full h-1/6 relative bottom-6 ">
-              <p className="text-center">
-                {" "}
-                is Turn of {isTurnOfPlayer ? "Blancas" : "Negras"}
-              </p>
-              <div className="flex justify-around bg-red-900 h-full py-4 ">
-                <p
-                  className={`
-             ${
-               isTurnOfPlayer
-                 ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-12"
-                 : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-10 border"
-             } 
-             inline-flex items-center justify-center rounded-full  px-2.5 py-0.5 border  transition-all duration-200 ease-in-out
-             `}
-                >
-                  Blancas: {piecesPlayer1.length}
-                </p>
-                <p className="flex h-full justify-center items-center">
-                  {isTurnOfPlayer ? "<" : ">"}
-                </p>
-                <p
-                  className={`
-            ${
-              !isTurnOfPlayer
-                ? "bg-emerald-100 text-emerald-700 border-emerald-700 w-28 h-12"
-                : "bg-gray-100 text-gray-500 border-gray-800 w-28 h-10 border"
-            } "}
-            inline-flex items-center justify-center rounded-full    transition-all duration-200 ease-in-out
-            `}
-                >
-                  Negras: {piecesPlayer2.length}
-                </p>
-              </div>
-            </div>
-          </section>
         </section>
       </section>
+      <div className="flex justify-center mt-9 ">
+        <button
+          className={`  ${
+            showSummary
+              ? "bg-green-500 hover:bg-green-700"
+              : "bg-red-500 hover:bg-red-700"
+          }      text-white font-bold py-2 px-4 rounded`}
+          onClick={() => {
+            setShowSummary((state) => (state ? false : true)),
+              setShowAlert((state) => (state ? false : true));
+          }}
+        >
+          {" "}
+          {showSummary ? "Reanudar" : "Pausa"}
+        </button>
+      </div>
     </main>
   );
 }
 
 export default App;
+
+const TheKingIsFallen = ({isCheckMate}: {isCheckMate?: boolean}) => {
+  return (
+    <section
+      className="absolute z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 "
+      onClick={() => {
+        window.location.reload();
+      }}
+    >
+      <div className="flex justify-center my-4 ">
+        <p className=" text-center font-semibold text-xl ">{isCheckMate ? "Hake Mate" : 'Juego terminado'}</p>
+      </div>
+    </section>
+  );
+};
+
+const CoverBoard = ({
+  showAlert,
+  children,
+}: {
+  showAlert: boolean;
+  children: React.ReactNode;
+}) => {
+  return (
+    <>
+      {showAlert && (
+        <section className="absolute z-50 w-full h-full bg-black/40  rounded-md shadow-2xl ">
+          {children}
+        </section>
+      )}
+    </>
+  );
+};
 
 const PaintBoard = ({
   isBlack,
@@ -357,6 +489,8 @@ const PlayerSide = ({
   isTurnOfPlayer,
   enemyPieces,
   piecesPlayer,
+  
+
 }: {
   children: React.ReactNode;
   showNextMove: any;
@@ -366,20 +500,26 @@ const PlayerSide = ({
   isTurnOfPlayer: boolean;
   enemyPieces: Piece[];
   piecesPlayer: Piece[];
+  
 }) => {
   const isEnemyInSport = enemyPieces.find(
     (piece) => piece.initialPlace === location
   );
+  
+  //
+  
 
   return (
-    <div className="relative bottom-16 z-90">
-      <div>
+    <div id={!isEnemy ? "white side" : "black side"}  className={` relative bottom-16 z-90  `} >
+     
         {isTurnOfPlayer === !isEnemy &&
           showNextMove.includes(location) &&
           !piecesPlayer.map((piece) => piece.initialPlace).includes(location) &&
           pieceSelecteToMove !== undefined && (
             <div
-              className={`absolute w-[54px] h-[54px]   sm:w-16 sm:h-16  z-50  ${
+              className={`
+                
+                absolute top-[10px]   sm:top-0 w-[54px] h-[54px] sm:w-16 sm:h-16  z-20  ${
                 isEnemy
                   ? isEnemyInSport
                     ? ""
@@ -390,7 +530,7 @@ const PlayerSide = ({
               } `}
             ></div>
           )}
-      </div>
+     
 
       {children}
     </div>
@@ -398,3 +538,48 @@ const PlayerSide = ({
 };
 
 // UI
+
+const StartWindow =({ setStartGame, setShowAlert ,setPlayerVSPlayer}:{setStartGame:Function, setShowAlert:Function , setPlayerVSPlayer:Function}) =>{
+  return(
+    <section className="absolute z-50 w-[250px] h-[250px] bg-slate-200 shadow-inner translate-y-1/2 left-1/2 -translate-x-1/2 rounded-md  pt-4 ">
+      <p className=" text-center font-semibold text-xl ">Elige Modo Juego</p>
+
+      <ul>
+
+       
+        <li
+        onClick={() => {setStartGame(true);setShowAlert(false) ; setPlayerVSPlayer(true) }}
+        className="flex justify-center items-center cursor-pointer my-4  bg-white w-32 mx-auto rounded-full border   border-emerald-500 px-2.5 py-0.5 text-emerald-700 active:bg-emerald-400 active:text-teal-50 hover:bg-emerald-300 shadow-md"
+          
+        >
+          <p>PVE</p>
+        </li>
+
+        <li
+        onClick={() => {setStartGame(true);setShowAlert(false) ; setPlayerVSPlayer(false) }}
+        className="flex justify-center items-center cursor-pointer my-4  bg-white w-32 mx-auto rounded-full border   border-emerald-500 px-2.5 py-0.5 text-emerald-700 active:bg-emerald-400 active:text-teal-50 hover:bg-emerald-300 shadow-md"
+          
+        >
+          <p>PVC</p>
+        </li>
+
+        <li>
+          <div className="flex items-center justify-center flex-col ">
+            <p>Dificultad</p>
+            <div>
+            {
+              [1,2,3].map((dificulty) => (
+                <button key={dificulty}
+                className="w-10 mt-2 mx-4 bg-white rounded-full border   border-blue-500 px-2.5 py-0.5 text-blue-700 active:bg-blue-400 active:text-teal-50 hover:bg-blue-300 shadow-md">{dificulty}</button>
+              ))
+            }
+            </div>
+          </div>
+        </li>
+
+      </ul>
+    </section>
+  )
+}
+
+
